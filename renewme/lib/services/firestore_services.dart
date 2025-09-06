@@ -7,16 +7,16 @@ class firestoreService {
   final _usersCollection = FirebaseFirestore.instance.collection('users');
 
   /// Menyimpan / update data pengguna di Firestore
-  Future<void> saveUser(user user) async {
+  Future<void> saveUser(User user) async {
     final userRef = _usersCollection.doc(user.id);
     await userRef.set(user.toFirestore());
   }
 
   /// Mengambil data pengguna dari Firestore berdasarkan UID
-  Future<user?> getUser(String uid) async {
+  Future<User?> getUser(String uid) async {
     final doc = await _usersCollection.doc(uid).get();
     if (doc.exists) {
-      return user.fromFirestore(doc);
+      return User.fromFirestore(doc);
     }
     return null;
   }

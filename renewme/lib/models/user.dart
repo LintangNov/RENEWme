@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class user {
+class User {
   final String id;
   final String username;
   final String email;
@@ -8,7 +8,7 @@ class user {
   final String phoneNumber;
   final String profilePictURL;
 
-  user({
+  User({
     required this.id,
     required this.username,
     required this.email,
@@ -17,10 +17,10 @@ class user {
     this.profilePictURL = '',
   });
 
-  factory user.fromFirestore(DocumentSnapshot doc) {
+  factory User.fromFirestore(DocumentSnapshot doc) {      //ambil data dari firestore
 
     final data = doc.data() as Map<String, dynamic>;
-    return user(
+    return User(
       id: doc.id,
       username: data['username']?? '',
       email: data['email']?? '',
@@ -30,7 +30,7 @@ class user {
     );
   }
 
-  Map<String, dynamic> toFirestore() {
+  Map<String, dynamic> toFirestore() {        //simpan data ke firestore
     return {
       'username': username,
       'email': email,

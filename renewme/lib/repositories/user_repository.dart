@@ -15,7 +15,7 @@ class userRepository {
   // --- Operasi Autentikasi dan Profil ---
 
   /// Mendaftarkan pengguna baru dan menyimpan data profilnya.
-  Future<user?> registeruser(String email, String password, String username, GeoPoint location, String phoneNumber) async {
+  Future<User?> registeruser(String email, String password, String username, GeoPoint location, String phoneNumber) async {
     try {
       // Langkah 1: Buat akun di Firebase Auth.
       final userCredential = await _authService.registerEmailPassword(email, password);
@@ -24,7 +24,7 @@ class userRepository {
         final uid = userCredential!.user!.uid;
         
         // Langkah 2: Buat objek user dan simpan profilnya di Firestore.
-        final newuser = user(
+        final newuser = User(
           id: uid,
           username: username,
           email: email,
@@ -42,7 +42,7 @@ class userRepository {
   }
 
   /// Masuk dengan akun yang sudah ada.
-  Future<user?> signIn(String email, String password) async {
+  Future<User?> signIn(String email, String password) async {
     try {
       // Langkah 1: Masuk ke Firebase Auth.
       final userCredential = await _authService.signInWithEmailAndPassword(email, password);
@@ -64,7 +64,7 @@ class userRepository {
   }
   
   /// Mengambil data pengguna yang sedang login.
-  Future<user?> getCurrentUser() async {
+  Future<User?> getCurrentUser() async {
     final uid = _authService.getCurrentUserId();
     if (uid!= null) {
       return await _firestoreService.getUser(uid);
@@ -76,7 +76,7 @@ class userRepository {
 
   /// Memperbarui data profil pengguna.
   /// Ini adalah operasi 'Update'.
-  Future<void> updateuser(user user) async {
+  Future<void> updateuser(User user) async {
     await _firestoreService.saveUser(user);
   }
 
