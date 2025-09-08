@@ -65,7 +65,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               style: TextButton.styleFrom(
                                 shape: CircleBorder(),
                                 // backgroundColor: Colors.white,
-                                foregroundColor: Colors.white
+                                foregroundColor: Colors.white,
                               ),
                             ),
                           ),
