@@ -75,46 +75,55 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         // Geo Map Location
-                        // Row(
-                        //   mainAxisAlignment: MainAxisAlignment.start,
-                        //   children: [
-                        //     TextButton.icon(
-                        //       onPressed: () {},
-                        //       icon: Icon(Icons.location_pin, color: Colors.red),
-                        //       label: const Text(
-                        //         'Lokasimu',
-                        //         style: TextStyle(color: Colors.white),
-                        //       ),
-                        //     ),
-                        //   ],
-                        // ),
-
-                        SizedBox(height: verticalPadding * 0.5),
-
-                        // SliverAppBar(
-                        //   backgroundColor: Colors.white,
-                        //   actions: [
-                        //     TextField(
-                        //       decoration: InputDecoration(
-                        //         filled: true,
-                        //         fillColor: Colors.white,
-                        //         disabledBorder: OutlineInputBorder(
-                        //           borderRadius: BorderRadius.circular(15),
-                        //         ),
-                        //         hintText: 'Mau makan apa ',
-                        //         prefixIcon: Icon(Icons.search),
-                        //         border: OutlineInputBorder(
-                        //           borderRadius: BorderRadius.circular(15),
-                        //         ),
-                        //       ),
-                        //     ),
-                        //   ],
-                        // ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            TextButton.icon(
+                              onPressed: () {},
+                              icon: Icon(Icons.location_pin, color: Colors.red),
+                              label: const Text(
+                                'Lokasimu',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
                 ],
               ),
+            ),
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _StickyHeaderDelegate(
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: horizontalPadding,
+                    vertical: verticalPadding * 0.5,
+                  ),
+                  alignment: Alignment.center,
+                  child: TextField(
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      disabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      hintText: 'Mau makan apa ',
+                      prefixIcon: Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                return ListTile(title: Text('Item #$index'));
+              }, childCount: 20),
             ),
           ],
         ),
@@ -125,7 +134,7 @@ class _HomePageState extends State<HomePage> {
         unselectedItemColor: Colors.grey,
         currentIndex: 0,
         onTap: (index) {
-          // Handle navigation tap 
+          // Handle navigation tap
         },
         type: BottomNavigationBarType.fixed,
         selectedLabelStyle: const TextStyle(
@@ -137,13 +146,37 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.home_filled),
             label: 'Beranda',
           ),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Cari'),
+          BottomNavigationBarItem(icon: Icon(Icons.add_box), label: 'Tambah'),
           BottomNavigationBarItem(
             icon: Icon(Icons.edit_document),
-            label: 'Pesanan saya',
+            label: 'Riwayat',
           ),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
         ],
       ),
     );
   }
+}
+
+class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+  _StickyHeaderDelegate({required this.child});
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return child;
+  }
+
+  @override
+  double get maxExtent => 85; // Tinggi maksimum header
+  @override
+  double get minExtent => 85; // Tinggi minimum header
+  @override
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) =>
+      false;
 }
