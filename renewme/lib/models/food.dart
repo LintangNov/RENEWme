@@ -7,6 +7,8 @@ class Food {
   final String description;
   final String? imageUrl;
   final DateTime expiryDate;
+  final int quantity;
+  final int priceInRupiah;
 
   Food({
     required this.id,
@@ -14,6 +16,8 @@ class Food {
     required this.description,
     this.imageUrl='',
     required this.expiryDate,
+    this.quantity=1,
+    this.priceInRupiah=0,
   });
 
   factory Food.fromFirestore(DocumentSnapshot doc){   //ambil data dari firestore
@@ -24,6 +28,8 @@ class Food {
       description: data['description'] ?? '',
       imageUrl: data['imageUrl'],
       expiryDate: (data['expiryDate'] as Timestamp).toDate(),
+      quantity: data['quantity'] ?? 1,
+      priceInRupiah: data['priceInRupiah'] ?? 0,
     );
   }
 
@@ -34,6 +40,8 @@ class Food {
       'description' : description,
       'imageUrl' : imageUrl,
       'expiryDate' : expiryDate,
+      'quantity' : quantity,
+      'priceInRupiah' : priceInRupiah,
     };
   }
 }
