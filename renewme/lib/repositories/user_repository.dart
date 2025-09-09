@@ -6,16 +6,16 @@ import 'package:renewme/services/firestore_services.dart';
 
 /// userRepository mengelola logika bisnis terkait pengguna,
 /// menyambung antara authService dan firestoreService
-class userRepository {
+class UserRepository {
   final authService _authService;
   final firestoreService _firestoreService;
 
-  userRepository(this._authService, this. _firestoreService);
+  UserRepository(this._authService, this. _firestoreService);
 
   // --- Operasi Autentikasi dan Profil ---
 
   /// Mendaftarkan pengguna baru dan menyimpan data profilnya.
-  Future<User?> registeruser(String email, String password, String username, GeoPoint location, String phoneNumber) async {
+  Future<User?> registerUser(String email, String password, String username, GeoPoint location, String phoneNumber) async {
     try {
       // Langkah 1: Buat akun di Firebase Auth.
       final userCredential = await _authService.registerEmailPassword(email, password);
@@ -76,7 +76,7 @@ class userRepository {
 
   /// Memperbarui data profil pengguna.
   /// Ini adalah operasi 'Update'.
-  Future<void> updateuser(User user) async {
+  Future<void> updateUser(User user) async {
     await _firestoreService.saveUser(user);
   }
 
