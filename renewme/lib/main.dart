@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:renewme/services/auth_services.dart';
+// import 'package:renewme/services/auth_services.dart';
 import 'package:renewme/view/home_page.dart';
-import 'package:renewme/view/login_page/login_page.dart';
+// import 'package:renewme/view/login_page/login_page.dart';
 import 'firebase_options.dart';
 import 'package:get/get.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(const MainApp());
 }
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
-  
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +24,12 @@ class MainApp extends StatelessWidget {
       theme: ThemeData(
         textTheme: GoogleFonts.poppinsTextTheme(),
         useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Color(0xFF5ABE79),
+        ).copyWith(
+          primary: Color(0xFF5ABE79),
+          secondaryContainer: Color(0xFFDFF1DB),),
+
       ),
       home: const HomePage(),
     );

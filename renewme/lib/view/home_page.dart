@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:renewme/models/food.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,112 +19,206 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE5F0EA),
+      backgroundColor: Colors.white,
       body: SafeArea(
         top: false,
         bottom: true,
         child: CustomScrollView(
           slivers: [
-            SliverToBoxAdapter(
-              child: Stack(
-                children: [
-                  SizedBox(
-                    width: screenWidth,
-                    height: screenHeight * 0.25,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(30),
-                        bottomRight: Radius.circular(30),
-                      ),
-                      child: SizedBox(
-                        child: SvgPicture.asset(
-                          'assets/images/background.svg',
-                          fit: BoxFit.cover,
-                          alignment: Alignment.topCenter,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsetsGeometry.symmetric(
-                      horizontal: horizontalPadding,
-                      vertical: verticalPadding,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 4),
-                        //Greeting Text
-                        const Text(
-                          'Hello, User!',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-
-                        SizedBox(height: verticalPadding * 0.2),
-                        //Location Title
-                        const Text(
-                          'Anter saat ini:',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.white,
-                          ),
-                        ),
-                        // Geo Map Location
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            TextButton.icon(
-                              onPressed: () {},
-                              icon: Icon(Icons.location_pin, color: Colors.red),
-                              label: const Text(
-                                'Lokasimu',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SliverPersistentHeader(
+            // Ganti semua header-mu sebelumnya dengan SATU SliverAppBar ini
+            SliverAppBar(
               pinned: true,
-              delegate: _StickyHeaderDelegate(
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: horizontalPadding,
-                    vertical: verticalPadding * 0.5,
-                  ),
-                  alignment: Alignment.center,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              shadowColor: Colors.black38,
+              expandedHeight: screenHeight * 0.25,
+
+              // AppBar on Top
+              flexibleSpace: FlexibleSpaceBar(
+                background: Stack(
+                  children: [
+                    SizedBox.expand(
+                      child: SvgPicture.asset(
+                        'assets/images/background.svg',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: horizontalPadding,
+                        vertical: verticalPadding,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 4),
+                          //Greeting Text
+                          const Text(
+                            'Hello, User!',
+                            style: TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(height: verticalPadding * 0.1),
+                          //Location Title
+                          const Text(
+                            'Anter saat ini:',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.white,
+                            ),
+                          ),
+                          // Geo Map Location
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                child: Icon(
+                                  Icons.location_pin,
+                                  color: Colors.red,
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {},
+                                child: Text(
+                                  'Jl. Kebon Jeruk No.27, Jakarta',
+                                  style: TextStyle(color: Colors.white),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // App Bar on Scroll
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(35),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   child: TextField(
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.white,
-                      disabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      hintText: 'Mau makan apa ',
-                      prefixIcon: Icon(Icons.search),
+                      hintText: 'Mau makan apa..',
+                      prefixIcon: Icon(Icons.search_rounded),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide.none,
                       ),
                     ),
                   ),
                 ),
               ),
             ),
+
+            // Section Title 0
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: horizontalPadding * 0.4,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '🔥Promo Hari Ini',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        'Lihat Semua',
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             SliverList(
               delegate: SliverChildBuilderDelegate((context, index) {
-                return ListTile(title: Text('Item #$index'));
-              }, childCount: 20),
+                return _buildCardHorizontal(
+                  foodData: Food(
+                    id: 'food_$index',
+                    name: 'Mie Ayam Spesial $index',
+                    description: 'Mie ayam',
+                    imageUrl:
+                        'https://www.jagel.id/api/listimage/v/Siomay-Bandung-0-16461987aca51125.jpg',
+                    expiryDate: DateTime.now().add(Duration(days: 5 + index)),
+                    quantity: 5 - index,
+                    priceInRupiah: 15000 + (index * 5000),
+                  ),
+                );
+              }, childCount: 5),
+            ),
+
+            // Section Title 1
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: horizontalPadding * 0.5,
+                  vertical: verticalPadding * 0.1,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Rekomendasi untukmu',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        'Lihat Semua',
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // Item List 1
+            SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                return _buildCardVertical(
+                  foodData: Food(
+                    id: 'food_$index',
+                    name: 'Mie Ayam Spesial $index',
+                    description: 'Mie ayam',
+                    imageUrl:
+                        'https://www.jagel.id/api/listimage/v/Siomay-Bandung-0-16461987aca51125.jpg',
+                    expiryDate: DateTime.now().add(Duration(days: 5 + index)),
+                    quantity: 5 - index,
+                    priceInRupiah: 15000 + (index * 5000),
+                  ),
+                );
+              }, childCount: 5),
             ),
           ],
         ),
@@ -159,24 +254,319 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
-  final Widget child;
-  _StickyHeaderDelegate({required this.child});
+Widget _buildCardVertical({required Food foodData}) {
+  return Container(
+    margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+    // Material & InkWell untuk efek ripple yang benar
+    child: Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(15),
+      elevation: 2,
+      shadowColor: Colors.grey.shade100,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(15),
+        onTap: () {
+        },
+        child: Column(
+          mainAxisSize: MainAxisSize.min, 
+          children: [
+           
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(15),
+                    topRight: Radius.circular(15),
+                  ),
+                  child: Image.network(
+                    
+                    foodData.imageUrl ??
+                        'https://i.imgur.com/ew28hXp.png', 
+                    height: 150,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    // Tampilkan loading indicator saat gambar dimuat
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return const SizedBox(
+                        height: 150,
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    },
+                   
+                    errorBuilder: (context, error, stackTrace) {
+                      return const SizedBox(
+                        height: 150,
+                        child: Icon(
+                          Icons.broken_image,
+                          color: Colors.grey,
+                          size: 48,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Positioned(
+                  top: 12,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: const BoxDecoration(
+                      color: Colors.orange,
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(15),
+                        bottomRight: Radius.circular(15),
+                      ),
+                    ),
+                    child: Text(
+                      // Gunakan data kuantitas dari data
+                      'Sisa ${foodData.quantity}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
 
-  @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) {
-    return child;
-  }
+            
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    foodData.name, 
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    foodData.description, 
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.star,
+                            size: 20,
+                            color: Colors.orange.shade400,
+                          ),
+                          const SizedBox(width: 4),
+                          const Text(
+                            '4.9',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          // if (foodData.originalPrice > foodData.priceInRupiah)
+                          Text(
+                            'Rp${foodData.priceInRupiah + 10000}', 
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade500,
+                              decoration: TextDecoration.lineThrough,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Rp${foodData.priceInRupiah}', 
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
 
-  @override
-  double get maxExtent => 85; // Tinggi maksimum header
-  @override
-  double get minExtent => 85; // Tinggi minimum header
-  @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) =>
-      false;
+Widget _buildCardHorizontal({required Food foodData}) {
+  return Container(
+    margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+    height: 212,
+    child: ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemBuilder: (context, index) {
+
+        InkWell(
+          borderRadius: BorderRadius.circular(15),
+          onTap: () {
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min, 
+            children: [
+             
+              Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(15),
+                      topRight: Radius.circular(15),
+                    ),
+                    child: Image.network(
+                      
+                      foodData.imageUrl ??
+                          'https://i.imgur.com/ew28hXp.png', 
+                      height: 150,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      // Tampilkan loading indicator saat gambar dimuat
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return const SizedBox(
+                          height: 150,
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      },
+                     
+                      errorBuilder: (context, error, stackTrace) {
+                        return const SizedBox(
+                          height: 150,
+                          child: Icon(
+                            Icons.broken_image,
+                            color: Colors.grey,
+                            size: 48,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Positioned(
+                    top: 12,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: const BoxDecoration(
+                        color: Colors.orange,
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(15),
+                          bottomRight: Radius.circular(15),
+                        ),
+                      ),
+                      child: Text(
+                        // Gunakan data kuantitas dari data
+                        'Sisa ${foodData.quantity}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      foodData.name, 
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      foodData.description, 
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade600,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.star,
+                              size: 20,
+                              color: Colors.orange.shade400,
+                            ),
+                            const SizedBox(width: 4),
+                            const Text(
+                              '4.9',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            // if (foodData.originalPrice > foodData.priceInRupiah)
+                            Text(
+                              'Rp${foodData.priceInRupiah + 10000}', 
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey.shade500,
+                                decoration: TextDecoration.lineThrough,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Rp${foodData.priceInRupiah}', 
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    ),
+  );
 }
