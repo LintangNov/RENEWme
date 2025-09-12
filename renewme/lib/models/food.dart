@@ -23,7 +23,7 @@ class Food {
   factory Food.fromFirestore(DocumentSnapshot doc){   //ambil data dari firestore
     final data = doc.data() as Map<String, dynamic>;
     return Food(
-      id: data['id'] ?? '',
+      id: doc.id,
       name: data['name'] ?? '',
       description: data['description'] ?? '',
       imageUrl: data['imageUrl'],
