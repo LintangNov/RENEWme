@@ -66,8 +66,8 @@ class UserController extends GetxController {
       );
       if (newUser != null) {
         currentUser.value = newUser;
-        // Opsional: Navigasi ke halaman utama
-        // Get.offAll(() => HomePage());
+        // ke halaman utama
+        Get.offAll(() => HomePage());
       }
     } catch (e) {
       errorMessage.value = 'Gagal mendaftar. Silakan coba lagi.';
@@ -85,7 +85,7 @@ class UserController extends GetxController {
       final user = await _userRepository.signIn(email, password);
       if (user != null) {
         currentUser.value = user;
-        // Opsional: Navigasi ke halaman utama
+        // ke halaman utama
         Get.offAll(() => HomePage());
       }
     } catch (e) {
