@@ -15,7 +15,7 @@ class UserRepository {
   // --- Operasi Autentikasi dan Profil ---
 
   /// Mendaftarkan pengguna baru dan menyimpan data profilnya.
-  Future<User?> registerUser(String email, String password, String username, GeoPoint location, String phoneNumber) async {
+  Future<User?> registerUser(String email, String password, String username, GeoPoint? location, String phoneNumber) async {
     try {
       // Langkah 1: Buat akun di Firebase Auth.
       final userCredential = await _authService.registerEmailPassword(email, password);

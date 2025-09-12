@@ -47,7 +47,7 @@ class UserController extends GetxController {
     required String email,
     required String password,
     required String username,
-    required GeoPoint location,
+    GeoPoint? location = const GeoPoint(0, 0),
     required String phoneNumber,
   }) async {
     isLoading.value = true;
