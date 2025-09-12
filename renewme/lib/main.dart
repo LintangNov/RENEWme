@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:renewme/controllers/food_controller.dart';
 import 'package:renewme/view/dashboard_page.dart';
 import 'package:renewme/repositories/food_repository.dart';
+import 'package:renewme/view/home_page/home_page.dart';
 // import 'package:renewme/view/home_page/home_page.dart';
 // import 'package:renewme/view/login_page/login_page.dart';
 import 'firebase_options.dart';
@@ -52,7 +53,7 @@ class MainApp extends StatelessWidget {
           secondaryContainer: Color(0xFFDFF1DB),),
 
       ),
-      home: const DashboardPage(),
+      home: const HomePage(),
     );
   }
 }
