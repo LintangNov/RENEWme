@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:renewme/models/user.dart';
 
 
-class firestoreService {
+class FirestoreService {
   final _usersCollection = FirebaseFirestore.instance.collection('users');
 
   /// Menyimpan / update data pengguna di Firestore

@@ -1,8 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:renewme/models/user.dart';
+// import 'package:renewme/models/user.dart';
 import 'package:renewme/view/login_page/login_page.dart';
 import 'package:renewme/controllers/user_controller.dart';
 
@@ -173,7 +174,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 SizedBox(height: verticalPadding * 0.6),
 
                                 // Email
-                                TextField(
+                                TextFormField(
                                   enableInteractiveSelection: true,
                                   controller: emailController,
                                   decoration: InputDecoration(
@@ -195,30 +196,34 @@ class _RegisterPageState extends State<RegisterPage> {
                                 SizedBox(height: verticalPadding * 0.6),
 
                                 //Password
-                                TextField(
-                                  enableInteractiveSelection: true,
-                                  controller: passwordController,
-                                  obscureText: true,
-                                  decoration: InputDecoration(
-                                    labelText: 'Password',
-                                    prefixIcon: Icon(
-                                      Icons.lock,
-                                      size: verticalPadding * 0.5,
-                                    ),
-                                    suffixIcon: IconButton(
-                                      onPressed: () {},
-                                      icon: Icon(
-                                        Icons.visibility,
+                                Obx(() =>
+                                  TextField(
+                                    enableInteractiveSelection: true,
+                                    controller: passwordController,
+                                    obscureText: userController.isHidePassword.value,
+                                    decoration: InputDecoration(
+                                      labelText: 'Password',
+                                      prefixIcon: Icon(
+                                        Icons.lock,
                                         size: verticalPadding * 0.5,
-                                        color: Colors.grey,
                                       ),
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(15),
-                                    ),
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: horizontalPadding * 0.5,
-                                      vertical: verticalPadding * 0.4,
+                                      suffixIcon: IconButton(
+                                        onPressed: () {
+                                          userController.changePasswordVisibility();
+                                        },
+                                        icon: Icon(
+                                          Icons.visibility,
+                                          size: verticalPadding * 0.5,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: horizontalPadding * 0.5,
+                                        vertical: verticalPadding * 0.4,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -230,7 +235,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   height: screenHeight * 0.07,
                                   child: ElevatedButton(
                                     onPressed: () {
-                                      userController.registerUser(email: emailController.text, password: passwordController.text, username: nameController.text,); 
+                                      userController.registerUser(email: emailController.text, password: passwordController.text, username: nameController.text, phoneNumber: phoneController.text); 
                                       passwordController.clear();
                                       emailController.clear();
                                     },

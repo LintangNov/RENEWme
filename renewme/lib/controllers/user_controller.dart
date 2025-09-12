@@ -5,24 +5,28 @@ import 'package:renewme/repositories/user_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:renewme/view/home_page.dart';
 
-
 class UserController extends GetxController {
   // Deklarasi Repository sebagai dependensi.
   final UserRepository _userRepository = Get.find<UserRepository>();
 
-  
   // '.obs' (observable) membuat variabel ini reaktif,
   // sehingga setiap perubahan akan memicu refresh di UI.
   final Rx<User?> currentUser = Rx<User?>(null);
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;
 
+  final isHidePassword = true.obs;
+
   @override
   void onInit() {
     super.onInit();
     // Memuat data pengguna saat controller pertama kali diinisialisasi.
-    
+
     fetchCurrentUser();
+  }
+
+  void changePasswordVisibility() {
+    isHidePassword.value = !isHidePassword.value;
   }
 
   // mengambil data pengguna yang sedang login.
@@ -59,9 +63,8 @@ class UserController extends GetxController {
         username,
         location,
         phoneNumber,
-
       );
-      if (newUser!= null) {
+      if (newUser != null) {
         currentUser.value = newUser;
         // Opsional: Navigasi ke halaman utama
         // Get.offAll(() => HomePage());
@@ -75,15 +78,12 @@ class UserController extends GetxController {
   }
 
   // Sign in
-  Future<void> signIn({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> signIn({required String email, required String password}) async {
     isLoading.value = true;
     errorMessage.value = '';
     try {
       final user = await _userRepository.signIn(email, password);
-      if (user!= null) {
+      if (user != null) {
         currentUser.value = user;
         // Opsional: Navigasi ke halaman utama
         Get.offAll(() => HomePage());
@@ -124,12 +124,12 @@ class UserController extends GetxController {
     isLoading.value = true;
     errorMessage.value = '';
     try {
-      if (currentUser.value!= null) {
+      if (currentUser.value != null) {
         final updatedUser = User(
           id: currentUser.value!.id,
           username: username,
           email: currentUser.value!.email,
-          location: location?? currentUser.value!.location,
+          location: location ?? currentUser.value!.location,
           profilePictURL: currentUser.value!.profilePictURL,
           phoneNumber: currentUser.value!.phoneNumber,
         );
@@ -145,7 +145,7 @@ class UserController extends GetxController {
       isLoading.value = false;
     }
   }
-  
+
   // Hapus akun pengguna.
   Future<void> deleteUserAccount() async {
     isLoading.value = true;
@@ -166,6 +166,6 @@ class UserController extends GetxController {
 
   // Cek apakah pengguna sedang login.
   bool isLoggedIn() {
-    return currentUser.value!= null;
+    return currentUser.value != null;
   }
 }

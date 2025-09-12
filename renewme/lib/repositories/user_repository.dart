@@ -7,8 +7,8 @@ import 'package:renewme/services/firestore_services.dart';
 /// userRepository mengelola logika bisnis terkait pengguna,
 /// menyambung antara authService dan firestoreService
 class UserRepository {
-  final authService _authService;
-  final firestoreService _firestoreService;
+  final AuthService _authService;
+  final FirestoreService _firestoreService;
 
   UserRepository(this._authService, this. _firestoreService);
 

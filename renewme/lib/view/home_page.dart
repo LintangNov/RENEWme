@@ -415,9 +415,7 @@ Widget _buildCardHorizontal({required Food foodData}) {
   return Container(
     margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
     height: 212,
-    child: ListView.builder(
-      scrollDirection: Axis.horizontal,
-      itemBuilder: (context, index) {
+    child: 
 
         InkWell(
           borderRadius: BorderRadius.circular(15),
@@ -565,8 +563,6 @@ Widget _buildCardHorizontal({required Food foodData}) {
               ),
             ],
           ),
-        );
-      },
-    ),
+        ),
   );
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:renewme/view/login_page/register_page.dart';
 import 'package:renewme/controllers/user_controller.dart  ';
@@ -119,28 +120,29 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                                   ),
                                 ),
-
                                 SizedBox(height: verticalPadding * 0.8),
                                 //password
-                                TextField(
-                                  enableInteractiveSelection: true,
-                                  obscureText: true,
-                                  controller: passwordController,
-                                  decoration: InputDecoration(
-                                    labelText: 'Password',
-                                    prefixIcon: Icon(Icons.lock),
-                                    suffixIcon: IconButton(
-                                      onPressed: () {
-                                        
-                                      },
-                                      icon: Icon(Icons.visibility, color: Colors.grey,),
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(15),
-                                    ),
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: horizontalPadding * 0.5,
-                                      vertical: verticalPadding * 0.5,
+                                Obx(() =>
+                                  TextField(
+                                    enableInteractiveSelection: true,
+                                    controller: passwordController,
+                                    obscureText: userController.isHidePassword.value,
+                                    decoration: InputDecoration(
+                                      labelText: 'Password',
+                                      prefixIcon: Icon(Icons.lock),
+                                      suffixIcon: IconButton(
+                                        onPressed: () {
+                                          userController.changePasswordVisibility();
+                                        },
+                                        icon: Icon(Icons.visibility, color: Colors.grey,),
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: horizontalPadding * 0.5,
+                                        vertical: verticalPadding * 0.5,
+                                      ),
                                     ),
                                   ),
                                 ),
