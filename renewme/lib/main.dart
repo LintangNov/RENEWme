@@ -14,18 +14,15 @@ import 'package:renewme/repositories/user_repository.dart';
 import 'package:renewme/controllers/user_controller.dart'; 
 
 Future<void> initDependencies() async {
-  // 1. Daftarkan service-mu terlebih dahulu.
-  // Kita pakai lazyPut agar hanya dibuat saat pertama kali dibutuhkan (lebih efisien)
+
   Get.lazyPut(() => AuthService());
   Get.lazyPut(() => FirestoreService());
 
-  // 2. Daftarkan repository-mu.
-  // Saat UserRepository dibuat, GetX akan otomatis mencari service yang sudah terdaftar.
+
   Get.lazyPut(() => UserRepository(Get.find(), Get.find()));
   Get.lazyPut(() => FoodRepository(Get.find()));
 
-  // 3. Daftarkan controller utama yang akan sering dipakai.
-  // Kita pakai 'put' biasa agar langsung tersedia.
+
   Get.put(UserController());
   Get.put(FoodController());
 }

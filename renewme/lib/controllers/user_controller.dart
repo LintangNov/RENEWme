@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:renewme/models/user.dart';
 import 'package:renewme/repositories/user_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:renewme/view/dashboard_page.dart';
 import 'package:renewme/view/home_page/home_page.dart';
 
 class UserController extends GetxController {
@@ -67,7 +68,7 @@ class UserController extends GetxController {
       if (newUser != null) {
         currentUser.value = newUser;
         // ke halaman utama
-        Get.offAll(() => HomePage());
+        Get.offAll(() => DashboardPage());
       }
     } catch (e) {
       errorMessage.value = 'Gagal mendaftar. Silakan coba lagi.';
@@ -86,7 +87,7 @@ class UserController extends GetxController {
       if (user != null) {
         currentUser.value = user;
         // ke halaman utama
-        Get.offAll(() => HomePage());
+        Get.offAll(() => DashboardPage());
       }
     } catch (e) {
       errorMessage.value = 'Login gagal. Cek email dan kata sandi Anda.';
