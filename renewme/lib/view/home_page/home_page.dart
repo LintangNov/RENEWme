@@ -5,7 +5,7 @@ import 'package:renewme/controllers/food_controller.dart';
 import 'package:renewme/models/food.dart';
 import 'package:get/get.dart';
 
-import 'package:renewme/dashboard_page.dart';
+import 'package:renewme/view/dashboard_page.dart';
 import 'package:renewme/view/add_item_page/add_food_form.dart';
 import 'package:renewme/view/history_page/history_page.dart';
 import 'package:renewme/view/personal_page/personal_page.dart';
