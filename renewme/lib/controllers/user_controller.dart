@@ -3,17 +3,16 @@ import 'package:get/get.dart';
 import 'package:renewme/models/user.dart';
 import 'package:renewme/repositories/user_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:renewme/view/home_page.dart';
 
-// UserController mengelola semua logika dan state yang berkaitan dengan pengguna.
-// Dengan GetX, controller ini bisa diakses dan diperbarui dari mana saja.
+
 class UserController extends GetxController {
   // Deklarasi Repository sebagai dependensi.
-  // GetX akan secara otomatis menemukan instance UserRepository yang telah terdaftar.
   final UserRepository _userRepository = Get.find<UserRepository>();
 
-  // Variabel reaktif untuk menyimpan state aplikasi.
+  
   // '.obs' (observable) membuat variabel ini reaktif,
-  // sehingga setiap perubahan akan memicu rebuild di UI.
+  // sehingga setiap perubahan akan memicu refresh di UI.
   final Rx<User?> currentUser = Rx<User?>(null);
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;
@@ -22,11 +21,11 @@ class UserController extends GetxController {
   void onInit() {
     super.onInit();
     // Memuat data pengguna saat controller pertama kali diinisialisasi.
-    // Ini penting untuk menjaga sesi login.
+    
     fetchCurrentUser();
   }
 
-  // Metode ini mengambil data pengguna yang sedang login.
+  // mengambil data pengguna yang sedang login.
   Future<void> fetchCurrentUser() async {
     isLoading.value = true;
     errorMessage.value = '';
@@ -41,9 +40,9 @@ class UserController extends GetxController {
     }
   }
 
-  // --- Metode untuk Autentikasi ---
+  // --- Method Autentikasi ---
 
-  /// Mendaftarkan pengguna baru dengan memanggil repository.
+  // Mendaftarkan pengguna baru dengan memanggil repository.
   Future<void> registerUser({
     required String email,
     required String password,
@@ -75,7 +74,7 @@ class UserController extends GetxController {
     }
   }
 
-  /// Masuk dengan akun yang sudah ada.
+  // Sign in
   Future<void> signIn({
     required String email,
     required String password,
@@ -87,7 +86,7 @@ class UserController extends GetxController {
       if (user!= null) {
         currentUser.value = user;
         // Opsional: Navigasi ke halaman utama
-        // Get.offAll(() => HomePage());
+        Get.offAll(() => HomePage());
       }
     } catch (e) {
       errorMessage.value = 'Login gagal. Cek email dan kata sandi Anda.';
@@ -97,7 +96,7 @@ class UserController extends GetxController {
     }
   }
 
-  /// Keluar dari akun.
+  /// Logout akun.
   Future<void> signOut() async {
     isLoading.value = true;
     errorMessage.value = '';
@@ -116,7 +115,7 @@ class UserController extends GetxController {
 
   // --- Metode untuk Pengelolaan Profil ---
 
-  /// Memperbarui data profil pengguna.
+  // Update profil pengguna.
   Future<void> updateUserProfile({
     required String username,
     String? profilePhotoUrl,
@@ -147,7 +146,7 @@ class UserController extends GetxController {
     }
   }
   
-  /// Menghapus akun pengguna.
+  // Hapus akun pengguna.
   Future<void> deleteUserAccount() async {
     isLoading.value = true;
     errorMessage.value = '';
@@ -165,7 +164,7 @@ class UserController extends GetxController {
     }
   }
 
-  /// Mengecek apakah pengguna sedang login.
+  // Cek apakah pengguna sedang login.
   bool isLoggedIn() {
     return currentUser.value!= null;
   }

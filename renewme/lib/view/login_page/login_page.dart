@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:renewme/view/login_page/register_page.dart';
+import 'package:renewme/controllers/user_controller.dart  ';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,6 +19,10 @@ class _LoginPageState extends State<LoginPage> {
   double get horizontalPadding => screenWidth * 0.1;
 
   double get verticalPadding => screenWidth * 0.1;
+
+  UserController userController = UserController();
+  final passwordController = TextEditingController();
+  final emailController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -101,6 +106,7 @@ class _LoginPageState extends State<LoginPage> {
                                 // Email
                                 TextField(
                                   enableInteractiveSelection: true,
+                                  controller: emailController,
                                   decoration: InputDecoration(
                                     labelText: 'Email',
                                     prefixIcon: Icon(Icons.email),
@@ -119,12 +125,14 @@ class _LoginPageState extends State<LoginPage> {
                                 TextField(
                                   enableInteractiveSelection: true,
                                   obscureText: true,
-                                  // controller: ,
+                                  controller: passwordController,
                                   decoration: InputDecoration(
                                     labelText: 'Password',
                                     prefixIcon: Icon(Icons.lock),
                                     suffixIcon: IconButton(
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        
+                                      },
                                       icon: Icon(Icons.visibility, color: Colors.grey,),
                                     ),
                                     border: OutlineInputBorder(
@@ -160,7 +168,11 @@ class _LoginPageState extends State<LoginPage> {
                                   width: double.infinity,
                                   height: screenHeight * 0.07,
                                   child: ElevatedButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      userController.signIn(email: emailController.text, password: passwordController.text);
+                                      passwordController.clear();
+                                      emailController.clear();
+                                    },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: const Color(0xFF53B675),
                                       shape: RoundedRectangleBorder(
