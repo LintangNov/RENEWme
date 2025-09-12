@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:renewme/models/user.dart';
 import 'package:renewme/repositories/user_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:renewme/view/home_page.dart';
+import 'package:renewme/view/home_page/home_page.dart';
 
 class UserController extends GetxController {
   // Deklarasi Repository sebagai dependensi.

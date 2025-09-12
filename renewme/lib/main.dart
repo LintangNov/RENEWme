@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:renewme/view/login_page/login_page.dart';
+import 'package:renewme/controllers/food_controller.dart';
+import 'package:renewme/dashboard_page.dart';
+import 'package:renewme/repositories/food_repository.dart';
+// import 'package:renewme/view/home_page/home_page.dart';
+// import 'package:renewme/view/login_page/login_page.dart';
 import 'firebase_options.dart';
 import 'package:get/get.dart';
 import 'package:renewme/services/auth_services.dart';
@@ -18,10 +22,12 @@ Future<void> initDependencies() async {
   // 2. Daftarkan repository-mu.
   // Saat UserRepository dibuat, GetX akan otomatis mencari service yang sudah terdaftar.
   Get.lazyPut(() => UserRepository(Get.find(), Get.find()));
+  Get.lazyPut(() => FoodRepository(Get.find()));
 
   // 3. Daftarkan controller utama yang akan sering dipakai.
   // Kita pakai 'put' biasa agar langsung tersedia.
   Get.put(UserController());
+  Get.put(FoodController());
 }
 
 void main() async {
@@ -49,7 +55,7 @@ class MainApp extends StatelessWidget {
           secondaryContainer: Color(0xFFDFF1DB),),
 
       ),
-      home: const LoginPage(),
+      home: const DashboardPage(),
     );
   }
 }

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:renewme/view/login_page/register_page.dart';
-import 'package:renewme/controllers/user_controller.dart  ';
+import 'package:renewme/controllers/user_controller.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -21,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
 
   double get verticalPadding => screenWidth * 0.1;
 
-  UserController userController = UserController();
+  final UserController userController = Get.find<UserController>();
   final passwordController = TextEditingController();
   final emailController = TextEditingController();
 
@@ -105,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 // Email
-                                TextField(
+                                TextFormField(
                                   enableInteractiveSelection: true,
                                   controller: emailController,
                                   decoration: InputDecoration(
@@ -123,7 +124,7 @@ class _LoginPageState extends State<LoginPage> {
                                 SizedBox(height: verticalPadding * 0.8),
                                 //password
                                 Obx(() =>
-                                  TextField(
+                                  TextFormField(
                                     enableInteractiveSelection: true,
                                     controller: passwordController,
                                     obscureText: userController.isHidePassword.value,

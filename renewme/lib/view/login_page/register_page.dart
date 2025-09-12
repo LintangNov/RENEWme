@@ -23,7 +23,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   double get verticalPadding => screenWidth * 0.1;
 
-  UserController userController = UserController();
+  final UserController userController = Get.find<UserController>();
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
@@ -197,7 +197,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                                 //Password
                                 Obx(() =>
-                                  TextField(
+                                  TextFormField(
                                     enableInteractiveSelection: true,
                                     controller: passwordController,
                                     obscureText: userController.isHidePassword.value,
