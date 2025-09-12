@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:renewme/models/user.dart';
 import 'package:renewme/view/login_page/login_page.dart';
+import 'package:renewme/controllers/user_controller.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -19,6 +21,12 @@ class _RegisterPageState extends State<RegisterPage> {
   double get horizontalPadding => screenWidth * 0.1;
 
   double get verticalPadding => screenWidth * 0.1;
+
+  UserController userController = UserController();
+  final nameController = TextEditingController();
+  final phoneController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -123,6 +131,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 // Nama
                                 TextField(
                                   enableInteractiveSelection: true,
+                                  controller: nameController,
                                   decoration: InputDecoration(
                                     labelText: 'Nama',
                                     prefixIcon: Icon(
@@ -141,9 +150,10 @@ class _RegisterPageState extends State<RegisterPage> {
 
                                 SizedBox(height: verticalPadding * 0.6),
 
-                                // No ponsel
+                                // Phone Number
                                 TextField(
                                   enableInteractiveSelection: true,
+                                  controller: phoneController,
                                   decoration: InputDecoration(
                                     labelText: 'No Ponsel',
                                     prefixIcon: Icon(
@@ -165,6 +175,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 // Email
                                 TextField(
                                   enableInteractiveSelection: true,
+                                  controller: emailController,
                                   decoration: InputDecoration(
                                     labelText: 'Email',
                                     prefixIcon: Icon(
@@ -186,6 +197,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 //Password
                                 TextField(
                                   enableInteractiveSelection: true,
+                                  controller: passwordController,
                                   obscureText: true,
                                   decoration: InputDecoration(
                                     labelText: 'Password',
@@ -217,7 +229,11 @@ class _RegisterPageState extends State<RegisterPage> {
                                   width: double.infinity,
                                   height: screenHeight * 0.07,
                                   child: ElevatedButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      userController.registerUser(email: emailController.text, password: passwordController.text, username: nameController.text,); 
+                                      passwordController.clear();
+                                      emailController.clear();
+                                    },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: const Color(0xFF53B675),
                                       shape: RoundedRectangleBorder(

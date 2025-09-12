@@ -121,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
 
                                 SizedBox(height: verticalPadding * 0.8),
-
+                                //password
                                 TextField(
                                   enableInteractiveSelection: true,
                                   obscureText: true,
