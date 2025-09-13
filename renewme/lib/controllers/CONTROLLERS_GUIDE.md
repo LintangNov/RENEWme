@@ -129,3 +129,46 @@
    b. Sorting & Filtering
       - `sortFoodsByPrice({bool ascending = true})`: Mengurutkan `foodList` berdasarkan harga (termurah/termahal).
       - `sortFoodsByDistance()`: Mengurutkan `foodList` berdasarkan jarak terdekat dari pengguna. Method ini akan otomatis meminta lokasi jika belum ada.
+
+# SEARCH CONTROLLER GUIDE
+
+Controller ini dirancang khusus untuk mengelola semua logika di halaman pencarian, termasuk input pengguna, hasil filter, dan riwayat pencarian.
+
+### 1. Instalasi
+Controller ini bersifat spesifik untuk satu halaman, jadi cara inisialisasinya sedikit berbeda.
+
+   a. **Dependensi**: Pastikan `FoodController` sudah terdaftar di `main.dart`. `SearchController` membutuhkan `FoodController` untuk mendapatkan data master makanan.
+
+   b. **Inisialisasi di View**: Inisialisasi controller ini langsung di dalam `build` method halaman `SearchPage.dart` menggunakan `Get.put()`. GetX akan secara otomatis membuat dan menghapusnya saat halaman dibuka dan ditutup.
+   
+      ```dart
+      // file: lib/view/search_page/search_page.dart
+      
+      final SearchController controller = Get.put(SearchController());
+      ```
+
+### 2. Variabel Penting
+Akses variabel ini dari View melalui `controller` yang sudah Anda inisialisasi.
+
+* `TextEditingController textController`: Hubungkan ini ke `TextField` pencarian Anda untuk mengontrol teks input.
+* `RxList<Food> searchResultList`: **(Observable)** Daftar makanan hasil filter yang cocok dengan query pencarian.
+* `RxList<String> searchHistory`: **(Observable)** Daftar query (teks) yang pernah dicari oleh pengguna. Daftar ini akan otomatis tersimpan di memori perangkat.
+* `RxBool isSearching`: **(Observable)** Bernilai `true` saat pengguna sedang mengetik dan proses *debounce* sedang menunggu untuk dijalankan.
+
+### 3. Daftar Method Siap Pakai
+
+* `searchFoods(String query)`
+    * Method utama untuk melakukan pencarian secara *real-time*.
+    * **Cara Pakai**: Hubungkan ke properti `onChanged` dari `TextField` pencarian.
+    * **Catatan**: Method ini sudah dilengkapi *debounce* secara otomatis, sehingga pencarian hanya akan berjalan setelah pengguna berhenti mengetik sejenak.
+
+* `addToHistory(String query)`
+    * Menambahkan teks pencarian ke dalam daftar riwayat dan menyimpannya secara permanen.
+    * **Cara Pakai**: Hubungkan ke properti `onSubmitted` dari `TextField`, atau panggil saat pengguna memilih salah satu item dari hasil pencarian.
+
+* `clearHistory()`
+    * Menghapus semua data riwayat pencarian dari tampilan dan memori perangkat.
+    * **Cara Pakai**: Panggil dari `onPressed` sebuah tombol "Hapus Riwayat".
+
+### 4. Konsep Penting: Debouncing
+Controller ini menggunakan teknik `debounce` pada method `searchFoods`. Artinya, logika pencarian **tidak dijalankan pada setiap karakter yang diketik**, melainkan akan menunggu jeda singkat (500 milidetik) setelah pengguna berhenti mengetik. Ini membuat aplikasi jauh lebih efisien dan responsif.
