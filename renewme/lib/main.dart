@@ -53,7 +53,7 @@ class MainApp extends StatelessWidget {
           secondaryContainer: Color(0xFFDFF1DB),),
 
       ),
-      home: const HomePage(),
+      home: const DashboardPage(),
     );
   }
 }
