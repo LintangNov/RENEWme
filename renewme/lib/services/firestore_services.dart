@@ -2,7 +2,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:renewme/models/food.dart';
 import 'package:renewme/models/user.dart';
-import 'package:renewme/models/transaction.dart';
 
 
 class FirestoreService {

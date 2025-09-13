@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:renewme/controllers/food_controller.dart';
-import 'package:renewme/view/dashboard_page.dart';
 import 'package:renewme/repositories/food_repository.dart';
 import 'package:renewme/services/location_services.dart';
 import 'package:renewme/view/login_page/login_page.dart';
@@ -54,7 +53,7 @@ class MainApp extends StatelessWidget {
           secondary: Color(0xFFE5F0EA),
         ),
       ),
-      home: const PersonalPage(),
+      home: const LoginPage(),
     );
   }
 }

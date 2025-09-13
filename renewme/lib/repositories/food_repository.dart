@@ -4,7 +4,7 @@ import 'package:renewme/services/firestore_services.dart';
 
 class FoodRepository {
 
-   FirestoreService _firestoreService = FirestoreService();
+  final  FirestoreService _firestoreService;
 
   FoodRepository(this._firestoreService);
 
