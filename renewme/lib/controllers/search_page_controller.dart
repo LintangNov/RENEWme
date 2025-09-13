@@ -5,7 +5,7 @@ import 'package:renewme/controllers/food_controller.dart';
 import 'package:renewme/models/food.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SearchController extends GetxController {
+class SearchPageController extends GetxController {
 
   final FoodController _foodController = Get.find<FoodController>();
   
