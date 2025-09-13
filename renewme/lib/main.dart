@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:renewme/controllers/food_controller.dart';
 import 'package:renewme/view/dashboard_page.dart';
 import 'package:renewme/repositories/food_repository.dart';
-import 'package:renewme/view/home_page/home_page.dart';
+import 'package:renewme/services/location_services.dart';
 // import 'package:renewme/view/home_page/home_page.dart';
 // import 'package:renewme/view/login_page/login_page.dart';
 import 'firebase_options.dart';
@@ -18,6 +18,7 @@ Future<void> initDependencies() async {
 
   Get.lazyPut(() => AuthService());
   Get.lazyPut(() => FirestoreService());
+  Get.lazyPut(() => LocationService());
 
 
   Get.lazyPut(() => UserRepository(Get.find(), Get.find()));
@@ -25,7 +26,7 @@ Future<void> initDependencies() async {
 
 
   Get.put(UserController());
-  Get.put(FoodController());
+  Get.lazyPut(() => FoodController());
 }
 
 void main() async {

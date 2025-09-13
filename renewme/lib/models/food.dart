@@ -9,6 +9,8 @@ class Food {
   final DateTime expiryDate;
   final int quantity;
   final int priceInRupiah;
+  final String vendorId;
+  final GeoPoint location;
 
   Food({
     required this.id,
@@ -18,6 +20,8 @@ class Food {
     required this.expiryDate,
     this.quantity=1,
     this.priceInRupiah=0,
+    required this.vendorId,
+    required this.location,
   });
 
   factory Food.fromFirestore(DocumentSnapshot doc){   //ambil data dari firestore
@@ -30,6 +34,8 @@ class Food {
       expiryDate: (data['expiryDate'] as Timestamp).toDate(),
       quantity: data['quantity'] ?? 1,
       priceInRupiah: data['priceInRupiah'] ?? 0,
+      vendorId: data['vendorId'] ?? '',
+      location: data['location'] ?? const GeoPoint(0, 0),
     );
   }
 
@@ -42,6 +48,8 @@ class Food {
       'expiryDate' : expiryDate,
       'quantity' : quantity,
       'priceInRupiah' : priceInRupiah,
+      'vendorId' : vendorId,
+      'location' : location,
     };
   }
 }

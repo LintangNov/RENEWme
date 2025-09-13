@@ -1,18 +1,22 @@
 // lib/controllers/user_controller.dart
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:renewme/models/user.dart';
 import 'package:renewme/repositories/user_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:renewme/view/dashboard_page.dart';
-import 'package:renewme/view/home_page/home_page.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:renewme/services/location_services.dart';
 
 class UserController extends GetxController {
   // Deklarasi Repository sebagai dependensi.
   final UserRepository _userRepository = Get.find<UserRepository>();
+  final LocationService _locationService = Get.find<LocationService>();
 
   // '.obs' (observable) membuat variabel ini reaktif,
   // sehingga setiap perubahan akan memicu refresh di UI.
   final Rx<User?> currentUser = Rx<User?>(null);
+  final Rx<Position?> userPosition = Rx<Position?>(null);
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;
 
@@ -165,6 +169,32 @@ class UserController extends GetxController {
     }
   }
 
+  Future<void> updateUserLocation() async {
+    try {
+      // Set loading jadi true khusus untuk proses pencarian lokasi
+      isLoading.value = true;
+      final position = await _locationService.getCurrentLocation();
+      userPosition.value = position;
+      Get.snackbar(
+        'Lokasi Diperbarui',
+        'Lokasi Anda berhasil didapatkan.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } catch (e) {
+      errorMessage.value = e.toString();
+      Get.snackbar(
+        'Gagal Mendapatkan Lokasi',
+        errorMessage.value,
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+      );
+      print("Gagal mendapatkan lokasi: $e");
+    } finally {
+      // Set loading kembali ke false
+      isLoading.value = false;
+    }
+  }
   // Cek apakah pengguna sedang login.
   bool isLoggedIn() {
     return currentUser.value != null;

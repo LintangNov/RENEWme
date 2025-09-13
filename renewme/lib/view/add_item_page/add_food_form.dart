@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:renewme/controllers/food_controller.dart';
+import 'package:renewme/controllers/user_controller.dart';
 import 'package:renewme/models/food.dart';
 
 /// Halaman Form untuk Menambah Data Makanan Baru.
@@ -24,6 +25,7 @@ class _AddFoodPageState extends State<AddFoodPage> {
 
   // Mengambil instance FoodController yang dikelola oleh GetX.
   final FoodController foodController = Get.find<FoodController>();
+  final UserController userController = Get.find<UserController>();
 
   @override
   Widget build(BuildContext context) {
@@ -158,6 +160,8 @@ class _AddFoodPageState extends State<AddFoodPage> {
       quantity: int.tryParse(_quantityController.text) ?? 1,
       expiryDate: _selectedExpiryDate!,
       imageUrl: '', // Anda bisa menambahkan input untuk URL gambar nanti.
+      vendorId: userController.currentUser.value!.id,
+      location: userController.currentUser.value!.location!,
     );
 
     // 3. Panggil method addFood dari controller untuk menyimpan data.
