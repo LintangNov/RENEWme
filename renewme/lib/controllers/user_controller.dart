@@ -18,6 +18,7 @@ class UserController extends GetxController {
   final Rx<User?> currentUser = Rx<User?>(null);
   final Rx<Position?> userPosition = Rx<Position?>(null);
   final RxBool isLoading = false.obs;
+  final RxBool isUpdatingProfile = false.obs; 
   final RxString errorMessage = ''.obs;
 
   final isHidePassword = true.obs;
@@ -126,7 +127,7 @@ class UserController extends GetxController {
     String? profilePhotoUrl,
     GeoPoint? location,
   }) async {
-    isLoading.value = true;
+    isUpdatingProfile.value = true;
     errorMessage.value = '';
     try {
       if (currentUser.value != null) {
@@ -147,7 +148,7 @@ class UserController extends GetxController {
       errorMessage.value = 'Gagal memperbarui profil. Silakan coba lagi.';
       print('Error updating user: $e');
     } finally {
-      isLoading.value = false;
+      isUpdatingProfile.value = false;
     }
   }
 

@@ -58,17 +58,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         children: [
                           // Back button
                           Padding(
-                            padding: EdgeInsets.all(
-                              horizontalPadding * 0.4,
-                            ),
+                            padding: EdgeInsets.all(horizontalPadding * 0.4),
                             child: IconButton(
                               onPressed: () {
-                                Navigator.pop(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => LoginPage(),
-                                  ),
-                                );
+                                Get.back();
                               },
                               icon: Icon(Icons.arrow_back_ios_new),
                               style: TextButton.styleFrom(
@@ -95,7 +88,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                SizedBox(height: verticalPadding ),
+                                SizedBox(height: verticalPadding),
 
                                 //Header
                                 Container(
@@ -196,11 +189,12 @@ class _RegisterPageState extends State<RegisterPage> {
                                 SizedBox(height: verticalPadding * 0.6),
 
                                 //Password
-                                Obx(() =>
-                                  TextFormField(
+                                Obx(
+                                  () => TextFormField(
                                     enableInteractiveSelection: true,
                                     controller: passwordController,
-                                    obscureText: userController.isHidePassword.value,
+                                    obscureText:
+                                        userController.isHidePassword.value,
                                     decoration: InputDecoration(
                                       labelText: 'Password',
                                       prefixIcon: Icon(
@@ -209,7 +203,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                       ),
                                       suffixIcon: IconButton(
                                         onPressed: () {
-                                          userController.changePasswordVisibility();
+                                          userController
+                                              .changePasswordVisibility();
                                         },
                                         icon: Icon(
                                           Icons.visibility,
@@ -227,35 +222,83 @@ class _RegisterPageState extends State<RegisterPage> {
                                     ),
                                   ),
                                 ),
-
+                                Obx(() {
+                                  // Hanya tampilkan widget jika errorMessage tidak kosong
+                                  if (userController.errorMessage.isNotEmpty) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(top: 16.0),
+                                      child: Text(
+                                        userController.errorMessage.value,
+                                        style: const TextStyle(
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    );
+                                  }
+                                  // Jika tidak ada error, tampilkan widget kosong
+                                  return const SizedBox.shrink();
+                                }),
                                 SizedBox(height: verticalPadding * 2),
 
                                 SizedBox(
                                   width: double.infinity,
                                   height: screenHeight * 0.07,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      userController.registerUser(email: emailController.text, password: passwordController.text, username: nameController.text, phoneNumber: phoneController.text); 
-                                      passwordController.clear();
-                                      emailController.clear();
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF53B675),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(15),
+                                  child: Obx(
+                                    () => ElevatedButton(
+                                      onPressed:
+                                          userController.isLoading.value
+                                              ? null
+                                              : () async {
+                                                await userController
+                                                    .registerUser(
+                                                      email:
+                                                          emailController.text,
+                                                      password:
+                                                          passwordController
+                                                              .text,
+                                                      username:
+                                                          nameController.text,
+                                                      phoneNumber:
+                                                          phoneController.text,
+                                                    );
+
+                                                // Hanya hapus teks jika registrasi berhasil (tidak ada pesan error)
+                                                if (userController
+                                                    .errorMessage
+                                                    .isEmpty) {
+                                                  passwordController.clear();
+                                                  emailController.clear();
+                                                  nameController.clear();
+                                                  phoneController.clear();
+                                                }
+                                              },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(
+                                          0xFF53B675,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            15,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                    child: Text(
-                                      'Register',
-                                      style: TextStyle(
-                                        fontSize: screenWidth * 0.045,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
+                                      child: Obx(
+                                        () => Text(
+                                          userController.isLoading.value
+                                              ? 'Loading...'
+                                              : 'Register',
+                                          style: TextStyle(
+                                            fontSize: screenWidth * 0.045,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-
                                 SizedBox(height: verticalPadding * 0.20),
                               ],
                             ),

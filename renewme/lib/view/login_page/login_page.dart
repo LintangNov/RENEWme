@@ -5,28 +5,24 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:renewme/view/login_page/register_page.dart';
 import 'package:renewme/controllers/user_controller.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  double get screenWidth => MediaQuery.of(context).size.width;
-
-  double get screenHeight => MediaQuery.of(context).size.height;
-
-  double get horizontalPadding => screenWidth * 0.1;
-
-  double get verticalPadding => screenWidth * 0.1;
-
-  final UserController userController = Get.find<UserController>();
-  final passwordController = TextEditingController();
-  final emailController = TextEditingController();
-
-  @override
   Widget build(BuildContext context) {
+    // Pindahkan semua controller ke dalam build method
+    final UserController userController = Get.find<UserController>();
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+    
+    // Buat GlobalKey untuk Form
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+    // Variabel ukuran layar
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double horizontalPadding = screenWidth * 0.1;
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: SafeArea(
@@ -35,195 +31,148 @@ class _LoginPageState extends State<LoginPage> {
         child: Stack(
           children: [
             SizedBox.expand(
-              child: SvgPicture.asset(
-                'assets/images/background.svg',
-                fit: BoxFit.cover,
-              ),
+              child: SvgPicture.asset('assets/images/background.svg', fit: BoxFit.cover),
             ),
             LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
-                    ),
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
                     child: IntrinsicHeight(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           // Header
                           Container(
-                            margin: EdgeInsets.symmetric(
-                              vertical: screenWidth * 0.1,
-                            ),
                             width: screenWidth,
-                            height: screenHeight * 0.15,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: screenWidth * 0.1,
-                            ),
+                            height: screenHeight * 0.25,
+                            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                            alignment: Alignment.centerLeft,
                             child: Column(
+                              mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(
+                                const Text(
                                   'Selamat Datang',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.w900,
-                                  ),
+                                  style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900),
                                 ),
                                 SizedBox(height: screenHeight * 0.01),
                                 Text(
-                                  'Silahkan Login terlebih dahulu',
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.white,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w400,
-                                  ),
+                                  'Silakan login terlebih dahulu',
+                                  style: GoogleFonts.poppins(color: Colors.white, fontSize: 15),
                                 ),
                               ],
                             ),
                           ),
-
                           // Area form
                           Container(
-                            decoration: BoxDecoration(
+                            padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: horizontalPadding),
+                            decoration: const BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(30.0),
                                 topRight: Radius.circular(30.0),
                               ),
                             ),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: horizontalPadding,
-                              vertical: verticalPadding,
-                            ),
-                            width: screenWidth,
-                            height: screenHeight * 0.70,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                // Email
-                                TextFormField(
-                                  enableInteractiveSelection: true,
-                                  controller: emailController,
-                                  decoration: InputDecoration(
-                                    labelText: 'Email',
-                                    prefixIcon: Icon(Icons.email),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(15),
-                                    ),
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: horizontalPadding * 0.5,
-                                      vertical: verticalPadding * 0.5,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(height: verticalPadding * 0.8),
-                                //password
-                                Obx(() =>
+                            child: Form(
+                              key: formKey,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
                                   TextFormField(
-                                    enableInteractiveSelection: true,
-                                    controller: passwordController,
-                                    obscureText: userController.isHidePassword.value,
-                                    decoration: InputDecoration(
-                                      labelText: 'Password',
-                                      prefixIcon: Icon(Icons.lock),
-                                      suffixIcon: IconButton(
-                                        onPressed: () {
-                                          userController.changePasswordVisibility();
-                                        },
-                                        icon: Icon(Icons.visibility, color: Colors.grey,),
-                                      ),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(15),
-                                      ),
-                                      contentPadding: EdgeInsets.symmetric(
-                                        horizontal: horizontalPadding * 0.5,
-                                        vertical: verticalPadding * 0.5,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    TextButton(
-                                      onPressed: () {},
-                                      child: Text(
-                                        'Lupa Sandi?',
-                                        style: TextStyle(
-                                          color: const Color(0xFF53B675),
-                                          fontSize: screenWidth * 0.035,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                                SizedBox(height: verticalPadding * 2),
-
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: screenHeight * 0.07,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      userController.signIn(email: emailController.text, password: passwordController.text);
-                                      passwordController.clear();
-                                      emailController.clear();
+                                    controller: emailController,
+                                    decoration: const InputDecoration(labelText: 'Email', prefixIcon: Icon(Icons.email)),
+                                    keyboardType: TextInputType.emailAddress,
+                                    validator: (value) {
+                                      if (value == null || !GetUtils.isEmail(value)) {
+                                        return 'Format email tidak valid';
+                                      }
+                                      return null;
                                     },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF53B675),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(15),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      'Login',
-                                      style: TextStyle(
-                                        fontSize: screenWidth * 0.045,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
                                   ),
-                                ),
-
-                                SizedBox(height: verticalPadding * 0.20),
-
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Belum punya akun?',
-                                      style: TextStyle(
-                                        fontSize: screenWidth * 0.035,
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => RegisterPage(),
+                                  SizedBox(height: screenHeight * 0.03),
+                                  Obx(() => TextFormField(
+                                        controller: passwordController,
+                                        obscureText: userController.isHidePassword.value,
+                                        decoration: InputDecoration(
+                                          labelText: 'Password',
+                                          prefixIcon: const Icon(Icons.lock),
+                                          suffixIcon: IconButton(
+                                            icon: Icon(userController.isHidePassword.value ? Icons.visibility_off : Icons.visibility),
+                                            onPressed: userController.changePasswordVisibility,
                                           ),
-                                        );
-                                      },
-                                      child: Text(
-                                        'Register',
-                                        style: TextStyle(
-                                          color: const Color(0xFF53B675),
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: screenWidth * 0.035,
+                                        ),
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Password tidak boleh kosong';
+                                          }
+                                          return null;
+                                        },
+                                      )),
+                                      Obx(() {
+  // Hanya tampilkan widget jika errorMessage tidak kosong
+  if (userController.errorMessage.isNotEmpty) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0),
+      child: Text(
+        userController.errorMessage.value,
+        style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+  // Jika tidak ada error, tampilkan widget kosong
+  return const SizedBox.shrink(); 
+}),
+                                  Obx(() {
+                                    if (userController.errorMessage.isNotEmpty) {
+                                      return Padding(
+                                        padding: const EdgeInsets.only(top: 16.0),
+                                        child: Text(
+                                          userController.errorMessage.value,
+                                          style: const TextStyle(color: Colors.red),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      );
+                                    }
+                                    return const SizedBox.shrink();
+                                  }),
+                                  SizedBox(height: screenHeight * 0.05),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: screenHeight * 0.07,
+                                    child: Obx(() => ElevatedButton(
+                                          onPressed: userController.isLoading.value ? null : () async {
+                                            userController.errorMessage.value = '';
+                                            if (formKey.currentState!.validate()) {
+                                              await userController.signIn(
+                                                email: emailController.text,
+                                                password: passwordController.text,
+                                              );
+                                            }
+                                          },
+                                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF53B675)),
+                                          child: userController.isLoading.value
+                                              ? const CircularProgressIndicator(color: Colors.white)
+                                              : const Text('Login', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                                        )),
+                                  ),
+                                  SizedBox(height: screenHeight * 0.02),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Text('Belum punya akun?'),
+                                      TextButton(
+                                        onPressed: () => Get.to(() => const RegisterPage()),
+                                        child: const Text(
+                                          'Register',
+                                          style: TextStyle(color: Color(0xFF53B675), fontWeight: FontWeight.bold),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
