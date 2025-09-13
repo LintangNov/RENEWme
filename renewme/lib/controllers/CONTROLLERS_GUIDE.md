@@ -172,3 +172,36 @@ Akses variabel ini dari View melalui `controller` yang sudah Anda inisialisasi.
 
 ### 4. Konsep Penting: Debouncing
 Controller ini menggunakan teknik `debounce` pada method `searchFoods`. Artinya, logika pencarian **tidak dijalankan pada setiap karakter yang diketik**, melainkan akan menunggu jeda singkat (500 milidetik) setelah pengguna berhenti mengetik. Ini membuat aplikasi jauh lebih efisien dan responsif.
+
+# MAP CONTROLLER GUIDE 
+
+Controller ini bertugas sebagai "otak" di belakang layar untuk halaman peta. Ia mengambil data dari `UserController` dan `FoodController`, lalu menyiapkannya agar bisa ditampilkan dengan mudah oleh widget peta.
+
+### 1. Instalasi & Dependensi
+Controller ini dirancang untuk digunakan secara spesifik pada halaman peta.
+
+   a. **Dependensi**: Pastikan `UserController` dan `FoodController` sudah terdaftar di `main.dart` karena `MapController` membutuhkan keduanya untuk berfungsi.
+
+   b. **Inisialisasi di View**: Inisialisasi controller ini langsung di dalam `build` method halaman `MapPage.dart` menggunakan `Get.put()`. GetX akan otomatis membuat dan menghapusnya saat halaman dibuka dan ditutup.
+   
+      ```dart
+      // file: lib/view/map_page.dart
+      
+      final MapController controller = Get.put(MapController());
+      ```
+
+### 2. Variabel Observable
+Akses variabel ini dari `MapPage` melalui `controller` yang sudah diinisialisasi.
+
+* `RxList<Marker> markers`: Daftar penanda (marker) yang akan ditampilkan di peta. Daftar ini dibuat secara otomatis berdasarkan data di `foodList`.
+* `Rx<LatLng> initialCenter`: Titik tengah peta saat pertama kali dimuat. Secara default akan berpusat di Jakarta, tetapi akan otomatis menggunakan lokasi pengguna jika tersedia di `UserController`.
+* `RxBool isLoading`: Bernilai `true` saat controller sedang menyiapkan semua data peta. UI bisa menampilkan `CircularProgressIndicator` saat state ini aktif.
+
+### 3. Method Siap Pakai
+
+Sebagian besar logika di controller ini berjalan otomatis saat diinisialisasi (`onInit`). Method publik utamanya adalah untuk interaksi.
+
+* `onMarkerTapped(String foodName, int price)`
+    * **Fungsi**: Method yang dipanggil saat sebuah marker di peta ditekan.
+    * **Aksi**: Akan menampilkan `Snackbar` di bagian bawah layar yang berisi nama dan harga makanan.
+    * **Cara Pakai**: Method ini sudah terhubung secara otomatis ke properti `onPressed` dari setiap `IconButton` di dalam marker yang dibuat oleh controller.
