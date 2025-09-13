@@ -1,6 +1,6 @@
 # USER CONTROLLER GUIDE
 
-1. instalasi
+### 1. instalasi
     a. tambahkan paket get & user_cotroller:
         import 'package:get/get.dart';
         import 'package:renewme/controllers/user_controller.dart';
@@ -18,13 +18,14 @@
         // Inisialisasi UserController agar dapat diakses oleh semua View
         Get.put(UserController());
 
-2. variabel observable (jika berubah, tampilan juga berubah)
+### 2. variabel observable (jika berubah, tampilan juga berubah)
     - Rx<User?> currentUser; // data user yang sedang login, kalau tidak login nilainya null
     - RxBool isLoading; // bernilai true saat loading berlangsung
     - RxString errorMessage; // pesan kesalahan kalau ada kegagalan. berisi string kosong kalau tidak ada kesalahan ('')
+    - `Rx<Position?> userPosition`; // Menyimpan data lokasi GPS pengguna (latitude & longitude). Bernilai `null` jika lokasi belum didapatkan.
     *note: Rx = reactive (merubah tampilan kalau nilainya berubah)
 
-3. daftar method siap pakai
+### 3. daftar method siap pakai
     a. authentication
         # registerUser({required String email,required String password, required String username, required GeoPoint location, required String phoneNumber})
         - method pendaftaran akun baru
@@ -46,7 +47,9 @@
         - panggil lagi setelah profil diubah (untuk refresh)
         # updateUserProfile({required String username, String? profilePhotoUrl, GeoPoint? location})
         - panggil di bagian edit profil
-4. contoh di view (source: Gemini)
+        # updateUserLocation()
+        - Meminta izin & mengambil lokasi GPS pengguna saat ini, lalu menyimpannya ke variabel userPosition. Dipanggil saat fitur berbasis lokasi dibutuhkan.
+### 4. contoh di view (source: Gemini)
 
 
     // lib/views/login_page.dart
@@ -104,4 +107,25 @@
     }
 
 
+# FOOD CONTROLLER GUIDE
 
+
+### 1. Instalasi
+   a. Hubungkan controller di dalam View:
+      `final FoodController foodController = Get.find<FoodController>();`
+
+### 2. Variabel Observable
+   - `RxList<Food> foodList`: Daftar semua produk makanan.
+   - `RxBool isLoading`: Status loading khusus untuk operasi makanan.
+   - `RxString errorMessage`: Pesan kesalahan khusus untuk operasi makanan.
+
+### 3. Daftar Method Siap Pakai
+   a. Manajemen Data (CRUD)
+      - `fetchAllFoods()`: Memuat semua data makanan dari Firestore.
+      - `addFood(Food food)`: Menambahkan dokumen makanan baru.
+      - `updateFood(Food food)`: Memperbarui dokumen makanan yang sudah ada.
+      - `deleteFood(String foodId)`: Menghapus dokumen makanan.
+   
+   b. Sorting & Filtering
+      - `sortFoodsByPrice({bool ascending = true})`: Mengurutkan `foodList` berdasarkan harga (termurah/termahal).
+      - `sortFoodsByDistance()`: Mengurutkan `foodList` berdasarkan jarak terdekat dari pengguna. Method ini akan otomatis meminta lokasi jika belum ada.

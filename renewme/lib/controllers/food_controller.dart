@@ -64,14 +64,12 @@ class FoodController extends GetxController {
     isLoading.value = true;
     await _foodRepository.updateFood(food);
     
-    // --- OPTIMASI ---
-    // Cari index dari item yang diubah di dalam list.
+
     int index = foodList.indexWhere((item) => item.id == food.id);
     if (index != -1) {
-      // Ganti item lama dengan item baru di posisi yang sama.
+
       foodList[index] = food;
     }
-    // -----------------
 
     Get.snackbar("Sukses", "Makanan berhasil diperbarui.");
   } catch (e) {
