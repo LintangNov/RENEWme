@@ -5,10 +5,7 @@ import 'package:renewme/controllers/food_controller.dart';
 import 'package:renewme/models/food.dart';
 import 'package:get/get.dart';
 
-import 'package:renewme/view/dashboard_page.dart';
-import 'package:renewme/view/add_item_page/add_food_form.dart';
-import 'package:renewme/view/history_page/history_page.dart';
-import 'package:renewme/view/personal_page/personal_page.dart';
+
 import 'package:renewme/view/search_page/search_page.dart';
 import 'package:renewme/controllers/navigation_controller.dart';
 
@@ -300,33 +297,6 @@ class _HomePageState extends State<HomePage> {
                 );
               }, childCount: 2),
             ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Obx(
-        () => BottomNavigationBar(
-          backgroundColor: Colors.white,
-          selectedItemColor: Colors.green,
-          unselectedItemColor: Colors.grey,
-          currentIndex: navController.tabIndex.value,
-          onTap: navController.changeTabIndex,
-          type: BottomNavigationBarType.fixed,
-          selectedLabelStyle: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_filled),
-              label: 'Beranda',
-            ),
-            BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Cari'),
-            BottomNavigationBarItem(icon: Icon(Icons.add_box), label: 'Tambah'),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.edit_document),
-              label: 'Riwayat',
-            ),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
           ],
         ),
       ),

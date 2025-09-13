@@ -14,7 +14,6 @@ dependencies:
   cloud_firestore: ^5.0.2
   get: ^4.7.2
   google_fonts: ^6.3.1
-  mapbox_maps_flutter: ^2.0.0
   flutter_svg: ^2.0.9
   intl: ^0.20.2
 
