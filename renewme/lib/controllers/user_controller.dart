@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:renewme/view/dashboard_page.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:renewme/services/location_services.dart';
+import 'package:renewme/utils/location_helper.dart';
 
 class UserController extends GetxController {
   // Deklarasi Repository sebagai dependensi.
@@ -19,7 +20,10 @@ class UserController extends GetxController {
   final Rx<Position?> userPosition = Rx<Position?>(null);
   final RxBool isLoading = false.obs;
   final RxBool isUpdatingProfile = false.obs; 
+  final RxBool isFetchingLocation = false.obs;
   final RxString errorMessage = ''.obs;
+  final RxString userAddress = "".obs; 
+  final RxBool isFetchingAddress = false.obs;
 
   final isHidePassword = true.obs;
 
@@ -27,7 +31,6 @@ class UserController extends GetxController {
   void onInit() {
     super.onInit();
     // Memuat data pengguna saat controller pertama kali diinisialisasi.
-
     fetchCurrentUser();
   }
 
@@ -72,6 +75,7 @@ class UserController extends GetxController {
       );
       if (newUser != null) {
         currentUser.value = newUser;
+        await updateUserLocation();
         // ke halaman utama
         Get.offAll(() => DashboardPage());
       }
@@ -91,6 +95,7 @@ class UserController extends GetxController {
       final user = await _userRepository.signIn(email, password);
       if (user != null) {
         currentUser.value = user;
+        await updateUserLocation();
         // ke halaman utama
         Get.offAll(() => DashboardPage());
       }
@@ -171,16 +176,29 @@ class UserController extends GetxController {
   }
 
   Future<void> updateUserLocation() async {
+    isFetchingLocation.value = true; // Gunakan state loading terpisah
+    errorMessage.value = '';
     try {
-      // Set loading jadi true khusus untuk proses pencarian lokasi
-      isLoading.value = true;
       final position = await _locationService.getCurrentLocation();
       userPosition.value = position;
-      Get.snackbar(
-        'Lokasi Diperbarui',
-        'Lokasi Anda berhasil didapatkan.',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+
+      
+      if (currentUser.value != null) {
+        final newLocation = GeoPoint(position.latitude, position.longitude);
+        
+        await updateUserProfile(
+          username: currentUser.value!.username,
+          location: newLocation,
+        );
+        Get.snackbar(
+          'Lokasi Diperbarui',
+          'Lokasi Anda berhasil didapatkan dan disimpan.',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      } else {
+        Get.snackbar('Lokasi Didapatkan', 'Lokasi Anda berhasil didapatkan.');
+      }
+      
     } catch (e) {
       errorMessage.value = e.toString();
       Get.snackbar(
@@ -190,10 +208,36 @@ class UserController extends GetxController {
         backgroundColor: Colors.orange,
         colorText: Colors.white,
       );
-      print("Gagal mendapatkan lokasi: $e");
     } finally {
-      // Set loading kembali ke false
-      isLoading.value = false;
+      isFetchingLocation.value = false; 
+    }
+  }
+
+  Future<void> fetchUserAddress() async {
+    if (userPosition.value == null) {
+      await updateUserLocation(); 
+      if (userPosition.value == null) {
+        Get.snackbar('Error', 'Lokasi pengguna tidak ditemukan.');
+        return;
+      }
+    }
+    
+    try {
+      isFetchingAddress.value = true;
+      final position = userPosition.value!;
+      
+      // Panggil fungsi helper dari file terpisah
+      final String address = await getAddressFromCoordinates(
+        position.latitude,
+        position.longitude
+      );
+      
+      userAddress.value = address;
+
+    } catch (e) {
+      userAddress.value = 'Gagal mengambil alamat.';
+    } finally {
+      isFetchingAddress.value = false;
     }
   }
   // Cek apakah pengguna sedang login.

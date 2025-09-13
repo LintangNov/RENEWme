@@ -6,7 +6,7 @@ import 'package:renewme/view/login_page/register_page.dart';
 import 'package:renewme/controllers/user_controller.dart';
 
 class LoginPage extends StatelessWidget {
-  `LoginPage({super.key});
+  LoginPage({super.key});
 
   // Buat GlobalKey untuk Form
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();

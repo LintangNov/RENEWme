@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:renewme/controllers/food_controller.dart';
+import 'package:renewme/controllers/user_controller.dart';
 import 'package:renewme/models/food.dart';
 import 'package:get/get.dart';
 
@@ -19,6 +20,7 @@ class _HomePageState extends State<HomePage> {
   double get screenHeight => MediaQuery.of(context).size.height;
 
   final FoodController foodController = Get.find<FoodController>();
+  final UserController userController = Get.find<UserController>();
   double get horizontalPadding => screenWidth * 0.1;
   double get verticalPadding => screenWidth * 0.1;
 
@@ -99,14 +101,30 @@ class _HomePageState extends State<HomePage> {
                                   color: Colors.red,
                                 ),
                               ),
-                              TextButton(
-                                onPressed: () {},
-                                child: Text(
-                                  'Jl. Kebon Jeruk No.27, Jakarta',
-                                  style: TextStyle(color: Colors.white),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
+                              Expanded(
+                                child: Obx(() {
+                                  // Tampilkan indikator loading kecil saat alamat dicari
+                                  if (userController.isFetchingAddress.value) {
+                                    return const SizedBox(
+                                      height: 15,
+                                      width: 15,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    );
+                                  }
+                                  // Tampilkan alamat dari controller
+                                  return Text(
+                                    userController.userAddress.value,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  );
+                                }),
                               ),
                             ],
                           ),
@@ -479,19 +497,19 @@ class _HomePageState extends State<HomePage> {
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: 2,
-        // itemCount: 4, 
+        // itemCount: 4,
         padding: EdgeInsets.symmetric(horizontal: 16),
         itemBuilder: (context, index) {
           // Food food = foodController.foodList[index]; // Ambil data per index
           // Food food = 3; // Ambil data per index`
-        //   if (foodController.foodList.isEmpty) {
-        //   return Center(child: Text('Tidak ada makanan terdekat'));
-        // }
-        
-        // // Ambil maksimal 4 item atau jumlah yang tersedia
-        // int itemCount = foodController.foodList.length > 4 
-        //     ? 4 
-        //     : foodController.foodList.length;
+          //   if (foodController.foodList.isEmpty) {
+          //   return Center(child: Text('Tidak ada makanan terdekat'));
+          // }
+
+          // // Ambil maksimal 4 item atau jumlah yang tersedia
+          // int itemCount = foodController.foodList.length > 4
+          //     ? 4
+          //     : foodController.foodList.length;
           return Container(
             width: 180, // Lebar card
             margin: EdgeInsets.only(right: 16, top: 12, bottom: 12),
