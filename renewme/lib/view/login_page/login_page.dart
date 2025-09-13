@@ -6,7 +6,10 @@ import 'package:renewme/view/login_page/register_page.dart';
 import 'package:renewme/controllers/user_controller.dart';
 
 class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+  `LoginPage({super.key});
+
+  // Buat GlobalKey untuk Form
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -14,9 +17,6 @@ class LoginPage extends StatelessWidget {
     final UserController userController = Get.find<UserController>();
     final emailController = TextEditingController();
     final passwordController = TextEditingController();
-    
-    // Buat GlobalKey untuk Form
-    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     // Variabel ukuran layar
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -31,13 +31,18 @@ class LoginPage extends StatelessWidget {
         child: Stack(
           children: [
             SizedBox.expand(
-              child: SvgPicture.asset('assets/images/background.svg', fit: BoxFit.cover),
+              child: SvgPicture.asset(
+                'assets/images/background.svg',
+                fit: BoxFit.cover,
+              ),
             ),
             LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
                     child: IntrinsicHeight(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
@@ -46,7 +51,9 @@ class LoginPage extends StatelessWidget {
                           Container(
                             width: screenWidth,
                             height: screenHeight * 0.25,
-                            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: horizontalPadding,
+                            ),
                             alignment: Alignment.centerLeft,
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
@@ -54,19 +61,30 @@ class LoginPage extends StatelessWidget {
                               children: [
                                 const Text(
                                   'Selamat Datang',
-                                  style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.w900,
+                                  ),
                                 ),
                                 SizedBox(height: screenHeight * 0.01),
                                 Text(
                                   'Silakan login terlebih dahulu',
-                                  style: GoogleFonts.poppins(color: Colors.white, fontSize: 15),
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
                           // Area form
                           Container(
-                            padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: horizontalPadding),
+                            height: screenHeight * 0.6,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: horizontalPadding,
+                              vertical: horizontalPadding,
+                            ),
                             decoration: const BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.only(
@@ -81,56 +99,80 @@ class LoginPage extends StatelessWidget {
                                 children: [
                                   TextFormField(
                                     controller: emailController,
-                                    decoration: const InputDecoration(labelText: 'Email', prefixIcon: Icon(Icons.email)),
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: horizontalPadding * 0.5,
+                                        vertical: horizontalPadding * 0.5,
+                                      ),
+                                      labelText: 'Email',
+                                      prefixIcon: Icon(Icons.email),
+                                    ),
                                     keyboardType: TextInputType.emailAddress,
+
                                     validator: (value) {
-                                      if (value == null || !GetUtils.isEmail(value)) {
+                                      if (value == null ||
+                                          !GetUtils.isEmail(value)) {
                                         return 'Format email tidak valid';
                                       }
                                       return null;
                                     },
                                   ),
                                   SizedBox(height: screenHeight * 0.03),
-                                  Obx(() => TextFormField(
-                                        controller: passwordController,
-                                        obscureText: userController.isHidePassword.value,
-                                        decoration: InputDecoration(
-                                          labelText: 'Password',
-                                          prefixIcon: const Icon(Icons.lock),
-                                          suffixIcon: IconButton(
-                                            icon: Icon(userController.isHidePassword.value ? Icons.visibility_off : Icons.visibility),
-                                            onPressed: userController.changePasswordVisibility,
+                                  Obx(
+                                    () => TextFormField(
+                                      enableInteractiveSelection: true,
+
+                                      controller: passwordController,
+                                      obscureText:
+                                          userController.isHidePassword.value,
+                                      decoration: InputDecoration(
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            15,
                                           ),
                                         ),
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Password tidak boleh kosong';
-                                          }
-                                          return null;
-                                        },
-                                      )),
-                                      Obx(() {
-  // Hanya tampilkan widget jika errorMessage tidak kosong
-  if (userController.errorMessage.isNotEmpty) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16.0),
-      child: Text(
-        userController.errorMessage.value,
-        style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-  // Jika tidak ada error, tampilkan widget kosong
-  return const SizedBox.shrink(); 
-}),
+                                        contentPadding: EdgeInsets.symmetric(
+                                          horizontal: horizontalPadding * 0.5,
+                                          vertical: horizontalPadding * 0.5,
+                                        ),
+                                        labelText: 'Password',
+                                        prefixIcon: const Icon(Icons.lock),
+                                        suffixIcon: IconButton(
+                                          icon: Icon(
+                                            userController.isHidePassword.value
+                                                ? Icons.visibility_off
+                                                : Icons.visibility,
+                                          ),
+                                          onPressed:
+                                              userController
+                                                  .changePasswordVisibility,
+                                        ),
+                                      ),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Password tidak boleh kosong';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ),
+
                                   Obx(() {
-                                    if (userController.errorMessage.isNotEmpty) {
+                                    if (userController
+                                        .errorMessage
+                                        .isNotEmpty) {
                                       return Padding(
-                                        padding: const EdgeInsets.only(top: 16.0),
+                                        padding: const EdgeInsets.only(
+                                          top: 16.0,
+                                        ),
                                         child: Text(
                                           userController.errorMessage.value,
-                                          style: const TextStyle(color: Colors.red),
+                                          style: const TextStyle(
+                                            color: Colors.red,
+                                          ),
                                           textAlign: TextAlign.center,
                                         ),
                                       );
@@ -141,21 +183,46 @@ class LoginPage extends StatelessWidget {
                                   SizedBox(
                                     width: double.infinity,
                                     height: screenHeight * 0.07,
-                                    child: Obx(() => ElevatedButton(
-                                          onPressed: userController.isLoading.value ? null : () async {
-                                            userController.errorMessage.value = '';
-                                            if (formKey.currentState!.validate()) {
-                                              await userController.signIn(
-                                                email: emailController.text,
-                                                password: passwordController.text,
-                                              );
-                                            }
-                                          },
-                                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF53B675)),
-                                          child: userController.isLoading.value
-                                              ? const CircularProgressIndicator(color: Colors.white)
-                                              : const Text('Login', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-                                        )),
+                                    child: Obx(
+                                      () => ElevatedButton(
+                                        onPressed:
+                                            userController.isLoading.value
+                                                ? null
+                                                : () async {
+                                                  userController
+                                                      .errorMessage
+                                                      .value = '';
+                                                  if (formKey.currentState!
+                                                      .validate()) {
+                                                    await userController.signIn(
+                                                      email:
+                                                          emailController.text,
+                                                      password:
+                                                          passwordController
+                                                              .text,
+                                                    );
+                                                  }
+                                                },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(
+                                            0xFF53B675,
+                                          ),
+                                        ),
+                                        child:
+                                            userController.isLoading.value
+                                                ? const CircularProgressIndicator(
+                                                  color: Colors.white,
+                                                )
+                                                : const Text(
+                                                  'Login',
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                      ),
+                                    ),
                                   ),
                                   SizedBox(height: screenHeight * 0.02),
                                   Row(
@@ -163,10 +230,16 @@ class LoginPage extends StatelessWidget {
                                     children: [
                                       const Text('Belum punya akun?'),
                                       TextButton(
-                                        onPressed: () => Get.to(() => const RegisterPage()),
+                                        onPressed:
+                                            () => Get.to(
+                                              () => const RegisterPage(),
+                                            ),
                                         child: const Text(
                                           'Register',
-                                          style: TextStyle(color: Color(0xFF53B675), fontWeight: FontWeight.bold),
+                                          style: TextStyle(
+                                            color: Color(0xFF53B675),
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                       ),
                                     ],

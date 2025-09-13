@@ -30,55 +30,75 @@ class _AddFoodPageState extends State<AddFoodPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Tambah Makanan Baru"),
-      ),
+      appBar: AppBar(title: const Text("Tambah Makanan Baru")),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+        child: Container(
+          margin: const EdgeInsets.all(10),
+          padding: EdgeInsets.all(5),
+          decoration: BoxDecoration(color: Colors.yellow, borderRadius: BorderRadius.circular(15),),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Input field untuk nama makanan.
-              TextField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nama Makanan',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.fastfood),
+              const Text(
+                "Deskripsi ",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8,),
+              // nama makanan.
+              Container(
 
-              // Input field untuk deskripsi.
+                child: TextField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Nama Makanan',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    prefixIcon: Icon(Icons.fastfood),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // deskripsi.
               TextField(
                 controller: _descriptionController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Deskripsi',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
                   prefixIcon: Icon(Icons.description),
                 ),
               ),
               const SizedBox(height: 16),
 
-              // Input field untuk harga.
+              // harga.
               TextField(
                 controller: _priceController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Harga (Rupiah)',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.price_change),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  prefixIcon: Icon(Icons.attach_money_rounded),
                 ),
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 16),
 
-              // Input field untuk kuantitas/stok.
+              // kuantitas/stok.
               TextField(
                 controller: _quantityController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Kuantitas / Sisa',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
                   prefixIcon: Icon(Icons.inventory),
                 ),
                 keyboardType: TextInputType.number,
@@ -97,7 +117,9 @@ class _AddFoodPageState extends State<AddFoodPage> {
                   _selectedExpiryDate == null
                       ? 'Pilih Tanggal & Waktu'
                       // Format tanggal agar mudah dibaca oleh pengguna.
-                      : DateFormat('dd MMMM yyyy, HH:mm').format(_selectedExpiryDate!),
+                      : DateFormat(
+                        'dd MMMM yyyy, HH:mm',
+                      ).format(_selectedExpiryDate!),
                 ),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -113,7 +135,10 @@ class _AddFoodPageState extends State<AddFoodPage> {
                 onPressed: _saveFood,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  textStyle: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 child: const Text("Simpan Makanan"),
               ),
