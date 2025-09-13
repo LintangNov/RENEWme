@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:renewme/controllers/food_controller.dart';
+import 'package:get/get.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -9,6 +11,7 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final FocusNode _focusNode = FocusNode();
+  final FoodController foodController = Get.find<FoodController>();
   // final TextEditingController _controller = TextEditingController();
 
   @override
@@ -41,6 +44,26 @@ class _SearchPageState extends State<SearchPage> {
           ),
         ),
       ),
+      body: SafeArea(
+        bottom: true,
+        child: CustomScrollView(
+          slivers: [
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final item = 5;
+                  return ListTile(title: Text('item'));
+                },
+                childCount: 4,
+              ),
+             ),
+          ],
+        ),
+      ),
     );
   }
+
+  // Widget _buildHistoryList({required int index}) {
+  //   return ListTile(title: Text("History pencarian ke-$index"));
+  // }
 }

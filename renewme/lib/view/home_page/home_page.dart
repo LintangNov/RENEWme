@@ -5,7 +5,6 @@ import 'package:renewme/controllers/food_controller.dart';
 import 'package:renewme/models/food.dart';
 import 'package:get/get.dart';
 
-
 import 'package:renewme/view/search_page/search_page.dart';
 import 'package:renewme/controllers/navigation_controller.dart';
 
@@ -181,23 +180,21 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            SliverList(
-              delegate: SliverChildBuilderDelegate((context, index) {
-                return _buildCardHorizontal(
-                  foodData: Food(
-                    id: 'food_$index',
-                    name: 'Mie Ayam Spesial $index',
-                    description: 'Mie ayam',
-                    imageUrl:
-                        'https://www.jagel.id/api/listimage/v/Siomay-Bandung-0-16461987aca51125.jpg',
-                    expiryDate: DateTime.now().add(Duration(days: 5 + index)),
-                    quantity: 5 - index,
-                    priceInRupiah: 15000 + (index * 5000),
-                  ),
+            Obx(() {
+              if (foodController.foodList.isEmpty) {
+                return SliverToBoxAdapter(
+                  child: Center(child: Text('Tidak ada data')),
                 );
-              }, childCount: 1),
-            ),
-
+              }
+              // Tampilkan hanya 1 item untuk contoh, atau jika Anda ingin menampilkan lebih, pastikan daftar cukup panjang
+              return SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final food =
+                      foodController.foodList[0]; // atau index lain yang valid
+                  return _buildCardHorizontal(foodData: food);
+                }, childCount: 2),
+              );
+            }),
             // Section Title 0
             SliverToBoxAdapter(
               child: Padding(
@@ -230,22 +227,21 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            SliverList(
-              delegate: SliverChildBuilderDelegate((context, index) {
-                return _buildCardHorizontal(
-                  foodData: Food(
-                    id: 'food_$index',
-                    name: 'Mie Ayam Spesial $index',
-                    description: 'Mie ayam',
-                    imageUrl:
-                        'https://www.jagel.id/api/listimage/v/Siomay-Bandung-0-16461987aca51125.jpg',
-                    expiryDate: DateTime.now().add(Duration(days: 5 + index)),
-                    quantity: 5 - index,
-                    priceInRupiah: 15000 + (index * 5000),
-                  ),
+            Obx(() {
+              if (foodController.foodList.isEmpty) {
+                return SliverToBoxAdapter(
+                  child: Center(child: Text('Tidak ada data')),
                 );
-              }, childCount: 1),
-            ),
+              }
+              // Tampilkan hanya 1 item untuk contoh, atau jika Anda ingin menampilkan lebih, pastikan daftar cukup panjang
+              return SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final food =
+                      foodController.foodList[0]; // atau index lain yang valid
+                  return _buildCardHorizontal(foodData: food);
+                }, childCount: 2),
+              );
+            }),
 
             // Section Title 1
             SliverToBoxAdapter(
@@ -281,22 +277,19 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             // Item List 1
-            SliverList(
-              delegate: SliverChildBuilderDelegate((context, index) {
-                return _buildCardVertical(
-                  foodData: Food(
-                    id: 'food_$index',
-                    name: 'Mie Ayam Spesial $index',
-                    description: 'Mie ayam',
-                    imageUrl:
-                        'https://www.jagel.id/api/listimage/v/Siomay-Bandung-0-16461987aca51125.jpg',
-                    expiryDate: DateTime.now().add(Duration(days: 5 + index)),
-                    quantity: 5 - index,
-                    priceInRupiah: 15000 + (index * 5000),
-                  ),
+            Obx(() {
+              if (foodController.foodList.isEmpty) {
+                return SliverToBoxAdapter(
+                  child: Center(child: Text('Tidak ada data')),
                 );
-              }, childCount: 2),
-            ),
+              }
+              return SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final food = foodController.foodList[index];
+                  return _buildCardVertical(foodData: food);
+                }, childCount: foodController.foodList.length),
+              );
+            }),
           ],
         ),
       ),
@@ -328,7 +321,7 @@ class _HomePageState extends State<HomePage> {
                       topRight: Radius.circular(15),
                     ),
                     child: Image.network(
-                      foodData.imageUrl ?? 'https://i.imgur.com/ew28hXp.png',
+                      foodData.imageUrl.toString(),
                       height: 150,
                       width: 388,
                       fit: BoxFit.cover,
@@ -486,13 +479,20 @@ class _HomePageState extends State<HomePage> {
       height: 260, // WAJIB kasih height!
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        // itemCount: foodController.foodList.length,
-        itemCount: 4,
+        itemCount: 2,
+        // itemCount: 4, 
         padding: EdgeInsets.symmetric(horizontal: 16),
         itemBuilder: (context, index) {
           // Food food = foodController.foodList[index]; // Ambil data per index
-          // Food food = 3; // Ambil data per index
-
+          // Food food = 3; // Ambil data per index`
+        //   if (foodController.foodList.isEmpty) {
+        //   return Center(child: Text('Tidak ada makanan terdekat'));
+        // }
+        
+        // // Ambil maksimal 4 item atau jumlah yang tersedia
+        // int itemCount = foodController.foodList.length > 4 
+        //     ? 4 
+        //     : foodController.foodList.length;
           return Container(
             width: 180, // Lebar card
             margin: EdgeInsets.only(right: 16, top: 12, bottom: 12),
@@ -527,8 +527,7 @@ class _HomePageState extends State<HomePage> {
                           topRight: Radius.circular(15),
                         ),
                         child: Image.network(
-                          // food.imageUrl ??
-                          'https://picsum.photos/200/150?random=$index',
+                          foodData.imageUrl.toString(),
                           width: 250,
                           height: 125,
                           fit: BoxFit.cover,
