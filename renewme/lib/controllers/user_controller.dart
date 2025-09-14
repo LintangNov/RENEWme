@@ -8,6 +8,7 @@ import 'package:renewme/view/dashboard_page.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:renewme/services/location_services.dart';
 import 'package:renewme/utils/location_helper.dart';
+import 'package:renewme/view/login_page/login_page.dart';
 
 class UserController extends GetxController {
   // Deklarasi Repository sebagai dependensi.
@@ -22,7 +23,7 @@ class UserController extends GetxController {
   final RxBool isUpdatingProfile = false.obs; 
   final RxBool isFetchingLocation = false.obs;
   final RxString errorMessage = ''.obs;
-  final RxString userAddress = "".obs; 
+  final RxString userAddress = "Mencari lokasi...".obs;
   final RxBool isFetchingAddress = false.obs;
 
   final isHidePassword = true.obs;
@@ -30,8 +31,12 @@ class UserController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Memuat data pengguna saat controller pertama kali diinisialisasi.
-    fetchCurrentUser();
+    
+    fetchCurrentUser().then((_) {
+      if (isLoggedIn()) {
+        updateUserLocationAndAddress();
+      }
+    });
   }
 
   void changePasswordVisibility() {
@@ -53,7 +58,7 @@ class UserController extends GetxController {
     }
   }
 
-  // --- Method Autentikasi ---
+
 
   // Mendaftarkan pengguna baru dengan memanggil repository.
   Future<void> registerUser({
@@ -164,8 +169,7 @@ class UserController extends GetxController {
     try {
       await _userRepository.deleteUserAccount();
       currentUser.value = null;
-      // Opsional: Navigasi kembali ke halaman login.
-      // Get.offAll(() => LoginPage());
+      Get.offAll(() => LoginPage());
       Get.snackbar('Sukses', 'Akun berhasil dihapus.');
     } catch (e) {
       errorMessage.value = 'Gagal menghapus akun. Silakan coba lagi.';
@@ -215,31 +219,25 @@ class UserController extends GetxController {
 
   Future<void> fetchUserAddress() async {
     if (userPosition.value == null) {
-      await updateUserLocation(); 
-      if (userPosition.value == null) {
-        Get.snackbar('Error', 'Lokasi pengguna tidak ditemukan.');
-        return;
-      }
+      return; // Berhenti jika tidak ada koordinat
     }
-    
+    isFetchingAddress.value = true;
     try {
-      isFetchingAddress.value = true;
       final position = userPosition.value!;
-      
-      // Panggil fungsi helper dari file terpisah
-      final String address = await getAddressFromCoordinates(
-        position.latitude,
-        position.longitude
-      );
-      
+      final String address = await getAddressFromCoordinates(position.latitude, position.longitude);
       userAddress.value = address;
-
     } catch (e) {
       userAddress.value = 'Gagal mengambil alamat.';
     } finally {
       isFetchingAddress.value = false;
     }
   }
+
+  Future<void> updateUserLocationAndAddress() async {
+    await updateUserLocation();
+    await fetchUserAddress();
+  }
+
   // Cek apakah pengguna sedang login.
   bool isLoggedIn() {
     return currentUser.value != null;

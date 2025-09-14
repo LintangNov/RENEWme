@@ -4,15 +4,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:renewme/controllers/food_controller.dart';
 import 'package:renewme/repositories/food_repository.dart';
 import 'package:renewme/services/location_services.dart';
-import 'package:renewme/view/login_page/login_page.dart';
-// import 'package:renewme/view/home_page/home_page.dart';
-// import 'package:renewme/view/login_page/login_page.dart';
 import 'firebase_options.dart';
 import 'package:get/get.dart';
 import 'package:renewme/services/auth_services.dart';
 import 'package:renewme/services/firestore_services.dart';
 import 'package:renewme/repositories/user_repository.dart';
 import 'package:renewme/controllers/user_controller.dart';
+import 'package:renewme/view/auth_wrapper.dart';
 
 Future<void> initDependencies() async {
   Get.lazyPut(() => AuthService());
@@ -52,7 +50,7 @@ class MainApp extends StatelessWidget {
           secondary: Color(0xFFE5F0EA),
         ),
       ),
-      home: LoginPage(),
+      home: const AuthWrapper(),
     );
   }
 }

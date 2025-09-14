@@ -1,488 +1,94 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:renewme/controllers/food_controller.dart';
 import 'package:renewme/controllers/user_controller.dart';
 import 'package:renewme/models/food.dart';
-import 'package:get/get.dart';
-
 import 'package:renewme/view/search_page/search_page.dart';
-import 'package:renewme/controllers/navigation_controller.dart';
 
-class HomePage extends StatefulWidget {
+// Diubah menjadi StatelessWidget karena semua state dikelola oleh GetX.
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  double get screenWidth => MediaQuery.of(context).size.width;
-  double get screenHeight => MediaQuery.of(context).size.height;
-
-  final FoodController foodController = Get.find<FoodController>();
-  final UserController userController = Get.find<UserController>();
-  double get horizontalPadding => screenWidth * 0.1;
-  double get verticalPadding => screenWidth * 0.1;
-
-  final NavigationController navController = Get.put(NavigationController());
-
-  @override
   Widget build(BuildContext context) {
-    // Daftar halaman yang akan ditampilkan sesuai urutan di BottomNavigationBar
-    // final List<Widget> pages = [
-    //   const HomePage(),
-    //   const SearchPage(),
-    //   const AddFoodPage(),
-    //   const HistoryPage(),
-    //   const PersonalPage(),
-    // ];
+    // Semua controller diambil di dalam build method.
+    final FoodController foodController = Get.find<FoodController>();
+    final UserController userController = Get.find<UserController>();
+
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double horizontalPadding = screenWidth * 0.05;
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         top: false,
         bottom: true,
-        child: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              pinned: true,
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              shadowColor: Colors.black38,
-              expandedHeight: screenHeight * 0.25,
+        // RefreshIndicator untuk fitur "tarik untuk refresh".
+        child: RefreshIndicator(
+          onRefresh: () async {
+            // Memuat ulang semua data saat ditarik.
+            await userController.updateUserLocationAndAddress();
+            await foodController.fetchAllFoods();
+          },
+          child: CustomScrollView(
+            slivers: [
+              _buildSliverAppBar(context, screenHeight, horizontalPadding, userController),
 
-              // AppBar on Top
-              flexibleSpace: FlexibleSpaceBar(
-                background: Stack(
-                  children: [
-                    SizedBox.expand(
-                      child: SvgPicture.asset(
-                        'assets/images/background.svg',
-                        fit: BoxFit.cover,
+              // Judul seksi "Promo Hari Ini"
+              _buildSectionTitle(horizontalPadding, '🔥 Promo Hari Ini'),
+
+              // Daftar makanan horizontal untuk promo
+              Obx(() {
+                if (foodController.isLoading.value && foodController.foodList.isEmpty) {
+                  return const SliverToBoxAdapter(child: SizedBox.shrink());
+                }
+                if (foodController.foodList.isEmpty) {
+                  return const SliverToBoxAdapter(child: SizedBox.shrink());
+                }
+                // Menampilkan 5 item pertama sebagai promo
+                final promoItems = foodController.foodList.take(5).toList();
+                return _buildHorizontalFoodList(promoItems);
+              }),
+
+              // Judul seksi "Rekomendasi"
+              _buildSectionTitle(horizontalPadding, 'Rekomendasi Untukmu'),
+
+              // Daftar makanan vertikal untuk semua item
+              Obx(() {
+                if (foodController.isLoading.value) {
+                  return const SliverToBoxAdapter(
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(40.0),
+                        child: CircularProgressIndicator(),
                       ),
                     ),
+                  );
+                }
 
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: horizontalPadding,
-                        vertical: verticalPadding,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 4),
-                          //Greeting Text
-                          const Text(
-                            'Welcome back',
-                            style: TextStyle(
-                              fontSize: 30,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          //Location Title
-                          const Text(
-                            'Pesan sekarang,',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.white,
-                            ),
-                          ),
-                          // Geo Map Location
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                child: Icon(
-                                  Icons.location_pin,
-                                  color: Colors.red,
-                                ),
-                              ),
-                              Expanded(
-                                child: Obx(() {
-                                  // Tampilkan indikator loading kecil saat alamat dicari
-                                  if (userController.isFetchingAddress.value) {
-                                    return const SizedBox(
-                                      height: 15,
-                                      width: 15,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    );
-                                  }
-                                  // Tampilkan alamat dari controller
-                                  return Text(
-                                    userController.userAddress.value,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  );
-                                }),
-                              ),
-                            ],
-                          ),
-                        ],
+                if (foodController.foodList.isEmpty) {
+                  return const SliverToBoxAdapter(
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(40.0),
+                        child: Text('Belum ada makanan yang tersedia.'),
                       ),
                     ),
-                  ],
-                ),
-              ),
+                  );
+                }
 
-              // App Bar on Scroll
-              bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(35),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  child: TextField(
-                    readOnly: true,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const SearchPage()),
-                      );
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final food = foodController.foodList[index];
+                      return _buildCardVertical(foodData: food);
                     },
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white,
-                      hintText: 'Mau makan apa..',
-                      prefixIcon: Icon(Icons.search_rounded),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
+                    childCount: foodController.foodList.length,
                   ),
-                ),
-              ),
-            ),
-
-            // Section Title 0
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  left: horizontalPadding * 0.4,
-                  right: horizontalPadding * 0.4,
-                  top: 10,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '🔥Promo Hari Ini',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        'Lihat Semua',
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Obx(() {
-              if (foodController.foodList.isEmpty) {
-                return SliverToBoxAdapter(
-                  child: Center(child: Text('Tidak ada data')),
                 );
-              }
-              // Tampilkan hanya 1 item untuk contoh, atau jika Anda ingin menampilkan lebih, pastikan daftar cukup panjang
-              return SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final food =
-                      foodController.foodList[0]; // atau index lain yang valid
-                  return _buildCardHorizontal(foodData: food);
-                }, childCount: 2),
-              );
-            }),
-            // Section Title 0
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: horizontalPadding * 0.4,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Terdekat dari kamu',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        'Lihat Semua',
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Obx(() {
-              if (foodController.foodList.isEmpty) {
-                return SliverToBoxAdapter(
-                  child: Center(child: Text('Tidak ada data')),
-                );
-              }
-              // Tampilkan hanya 1 item untuk contoh, atau jika Anda ingin menampilkan lebih, pastikan daftar cukup panjang
-              return SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final food =
-                      foodController.foodList[0]; // atau index lain yang valid
-                  return _buildCardHorizontal(foodData: food);
-                }, childCount: 2),
-              );
-            }),
-
-            // Section Title 1
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: horizontalPadding * 0.5,
-                  vertical: verticalPadding * 0.1,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Rekomendasi untukmu',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        'Lihat Semua',
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            // Item List 1
-            Obx(() {
-              if (foodController.foodList.isEmpty) {
-                return SliverToBoxAdapter(
-                  child: Center(child: Text('Tidak ada data')),
-                );
-              }
-              return SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final food = foodController.foodList[index];
-                  return _buildCardVertical(foodData: food);
-                }, childCount: foodController.foodList.length),
-              );
-            }),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCardVertical({required Food foodData}) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      height: 250,
-      width: 400,
-      // Material & InkWell untuk efek ripple yang benar
-      child: Material(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        elevation: 2,
-        shadowColor: Colors.grey.shade100,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(15),
-          onTap: () {},
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(15),
-                      topRight: Radius.circular(15),
-                    ),
-                    child: Image.network(
-                      foodData.imageUrl.toString(),
-                      height: 150,
-                      width: 388,
-                      fit: BoxFit.cover,
-                      // Tampilkan loading indicator saat gambar dimuat
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return const SizedBox(
-                          height: 150,
-                          child: Center(child: CircularProgressIndicator()),
-                        );
-                      },
-
-                      errorBuilder: (context, error, stackTrace) {
-                        return const SizedBox(
-                          height: 150,
-                          child: Icon(
-                            Icons.broken_image,
-                            color: Colors.grey,
-                            size: 48,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  Positioned(
-                    top: 12,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: const BoxDecoration(
-                        color: Colors.orange,
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(15),
-                          bottomRight: Radius.circular(15),
-                        ),
-                      ),
-                      child: Text(
-                        // Gunakan data kuantitas dari data
-                        'Sisa ${foodData.quantity}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      foodData.name,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 60,
-                              height: 30,
-                              decoration: BoxDecoration(
-                                color: Colors.green,
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.star,
-                                    size: 20,
-                                    color: Colors.white,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  const Text(
-                                    '4.9',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(width: 10),
-                            SizedBox(
-                              width: 100,
-                              child: Text(
-                                'Ambil hari ini, 19.00 - 10.00',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey.shade600,
-                                ),
-                                softWrap: true,
-                                maxLines: 2,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.baseline,
-                          textBaseline: TextBaseline.alphabetic,
-                          children: [
-                            // if (foodData.originalPrice > foodData.priceInRupiah)
-                            // Text(
-                            //   'Rp${foodData.priceInRupiah + 10000}',
-                            //   style: TextStyle(
-                            //     fontSize: 12,
-                            //     color: Colors.grey.shade500,
-                            //     decoration: TextDecoration.lineThrough,
-                            //   ),
-                            // ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Rp${foodData.priceInRupiah}',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w900,
-                                color: Colors.green,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+              }),
             ],
           ),
         ),
@@ -490,196 +96,223 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildCardHorizontal({required Food foodData}) {
-    return SizedBox(
-      height: 260, // WAJIB kasih height!
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: 2,
-        // itemCount: 4,
-        padding: EdgeInsets.symmetric(horizontal: 16),
-        itemBuilder: (context, index) {
-          // Food food = foodController.foodList[index]; // Ambil data per index
-          // Food food = 3; // Ambil data per index`
-          //   if (foodController.foodList.isEmpty) {
-          //   return Center(child: Text('Tidak ada makanan terdekat'));
-          // }
-
-          // // Ambil maksimal 4 item atau jumlah yang tersedia
-          // int itemCount = foodController.foodList.length > 4
-          //     ? 4
-          //     : foodController.foodList.length;
-          return Container(
-            width: 180, // Lebar card
-            margin: EdgeInsets.only(right: 16, top: 12, bottom: 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(15),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.shade300,
-                  spreadRadius: 1,
-                  blurRadius: 5,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: InkWell(
-              onTap: () {
-                // print('Tapped: ${food.name}');
-                print('Tapped: bro');
-                // Tambahkan navigasi atau action lain di sini
-              },
-              borderRadius: BorderRadius.circular(15),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Bagian gambar
-                  Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(15),
-                          topRight: Radius.circular(15),
-                        ),
-                        child: Image.network(
-                          foodData.imageUrl.toString(),
-                          width: 250,
-                          height: 125,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Container(
-                              color: Colors.grey[300],
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              ),
+  // Widget helper untuk SliverAppBar
+  SliverAppBar _buildSliverAppBar(BuildContext context, double screenHeight, double horizontalPadding, UserController userController) {
+    return SliverAppBar(
+      pinned: true,
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      expandedHeight: screenHeight * 0.25,
+      flexibleSpace: FlexibleSpaceBar(
+        background: Stack(
+          fit: StackFit.expand,
+          children: [
+            SvgPicture.asset('assets/images/background.svg', fit: BoxFit.cover),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding).copyWith(top: kToolbarHeight),
+              // --- PERBAIKAN DI SINI ---
+              // Menambahkan padding di bagian bawah untuk memberi ruang bagi search bar.
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 60.0), // 60.0 adalah tinggi search bar
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Obx(() => Text(
+                          // Menggunakan nama user jika ada, jika tidak tampilkan default
+                          'Welcome, ${userController.currentUser.value?.username ?? 'Tamu'}',
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.white),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )),
+                    const SizedBox(height: 10),
+                    const Text('Lokasi Anda saat ini:', style: TextStyle(fontSize: 14, color: Colors.white70)),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(Icons.location_pin, color: Colors.red, size: 18),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Obx(() {
+                            if (userController.isFetchingLocation.value || userController.isFetchingAddress.value) {
+                              return Text('Mencari lokasi anda....',
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                              );
+                            }
+                            return Text(
+                              userController.userAddress.value,
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             );
-                          },
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: Colors.grey[300],
-                              child: Icon(
-                                Icons.food_bank,
-                                size: 40,
-                                color: Colors.grey[600],
-                              ),
-                            );
-                          },
+                          }),
                         ),
-                      ),
-                      // Badge sisa
-                      Positioned(
-                        top: 8,
-                        left: 0,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.orange,
-                            borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(8),
-                              bottomRight: Radius.circular(8),
-                            ),
-                          ),
-                          child: Text(
-                            // 'Sisa ${food.quantity}',
-                            'Sisa 4',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  // Bagian text
-                  Expanded(
-                    child: Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            // food.name,
-                            'Mie Ayam Spesial',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w900,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          SizedBox(height: 2),
-                          Text(
-                            // food.description,
-                            'Ambil hari ini, 09.00 - 10.00',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.grey[600],
-                            ),
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.star,
-                                      size: 20,
-                                      color: Colors.orange.shade400,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    const Text(
-                                      '4.9',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  textBaseline: TextBaseline.alphabetic,
-                                  children: [
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      'Rp${foodData.priceInRupiah}',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w900,
-                                        color: Colors.green,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                      ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          );
-        },
+          ],
+        ),
+      ),
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+          child: TextField(
+            readOnly: true,
+            onTap: () => Get.to(() => const SearchPage()),
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.white,
+              hintText: 'Cari makanan...',
+              prefixIcon: const Icon(Icons.search_rounded),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
+              contentPadding: EdgeInsets.zero,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Widget helper untuk judul seksi
+  SliverToBoxAdapter _buildSectionTitle(double horizontalPadding, String title) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(horizontalPadding, 24, horizontalPadding, 8),
+        child: Text(
+          title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+
+  // Widget helper untuk daftar makanan horizontal
+  SliverToBoxAdapter _buildHorizontalFoodList(List<Food> foods) {
+    return SliverToBoxAdapter(
+      child: SizedBox(
+        height: 240,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: foods.length,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemBuilder: (context, index) {
+            return _buildCardHorizontal(foodData: foods[index]);
+          },
+        ),
       ),
     );
   }
 }
+
+// --- WIDGET CARD (BISA DIPINDAH KE FILE TERPISAH) ---
+
+Widget _buildCardVertical({required Food foodData}) {
+  return Container(
+    margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+    child: Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(15),
+      elevation: 2,
+      shadowColor: Colors.grey.shade100,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(15),
+        onTap: () { /* Navigasi ke detail page */ },
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15)),
+                  child: Image.network(
+                    foodData.imageUrl ?? 'https://i.imgur.com/ew28hXp.png',
+                    height: 150,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, progress) => progress == null ? child : const SizedBox(height: 150, child: Center(child: CircularProgressIndicator())),
+                    errorBuilder: (context, error, stack) => const SizedBox(height: 150, child: Icon(Icons.broken_image, color: Colors.grey, size: 48)),
+                  ),
+                ),
+                Positioned(
+                  top: 12,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: const BoxDecoration(
+                      color: Colors.orange,
+                      borderRadius: BorderRadius.only(topRight: Radius.circular(15), bottomRight: Radius.circular(15)),
+                    ),
+                    child: Text('Sisa ${foodData.quantity}', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(foodData.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 4),
+                  Text(foodData.description, style: TextStyle(fontSize: 12, color: Colors.grey.shade600), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(children: [ const Icon(Icons.star, size: 20, color: Colors.orange), const SizedBox(width: 4), const Text('4.9', style: TextStyle(fontWeight: FontWeight.bold))]),
+                      Text('Rp${foodData.priceInRupiah}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.green)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+Widget _buildCardHorizontal({required Food foodData}) {
+  return Container(
+    width: 180,
+    margin: const EdgeInsets.only(right: 16, top: 8, bottom: 8),
+    child: Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(15),
+      elevation: 2,
+      shadowColor: Colors.grey.shade100,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(15),
+        onTap: () { /* Navigasi ke detail page */ },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15)),
+              child: Image.network(
+                foodData.imageUrl ?? 'https://i.imgur.com/ew28hXp.png',
+                height: 120,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                loadingBuilder: (context, child, progress) => progress == null ? child : const SizedBox(height: 120, child: Center(child: CircularProgressIndicator())),
+                errorBuilder: (context, error, stack) => const SizedBox(height: 120, child: Icon(Icons.broken_image, color: Colors.grey, size: 40)),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(foodData.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14), maxLines: 2, overflow: TextOverflow.ellipsis),
+            ),
+            const Spacer(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              child: Text('Rp${foodData.priceInRupiah}', style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.green)),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
