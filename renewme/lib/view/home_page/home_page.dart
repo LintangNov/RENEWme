@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -6,7 +7,6 @@ import 'package:renewme/controllers/user_controller.dart';
 import 'package:renewme/models/food.dart';
 import 'package:renewme/view/search_page/search_page.dart';
 
-// --- MERGE: Struktur StatefulWidget milikmu tetap dipertahankan ---
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -24,16 +24,13 @@ class _HomePageState extends State<HomePage> {
     // Definisi ukuran layar agar mudah diakses
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
-    final double horizontalPadding =
-        screenWidth * 0.05; // Sedikit disesuaikan agar lebih pas
+    final double horizontalPadding = screenWidth * 0.05;
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         top: false,
         bottom: true,
-        // --- MERGE: Fitur 1 -> Menambahkan RefreshIndicator dari AI ---
-        // Membungkus CustomScrollView agar bisa ditarik untuk refresh
         child: RefreshIndicator(
           onRefresh: () async {
             // Logika refresh diambil dari AI: memuat ulang lokasi dan data makanan
@@ -42,7 +39,7 @@ class _HomePageState extends State<HomePage> {
           },
           child: CustomScrollView(
             slivers: [
-              // --- MERGE: Fitur 2 & 3 -> AppBar dengan Nama & Lokasi Dinamis ---
+              // AppBar
               SliverAppBar(
                 pinned: true,
                 backgroundColor: Theme.of(context).colorScheme.primary,
@@ -66,7 +63,7 @@ class _HomePageState extends State<HomePage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Teks sambutan dengan nama pengguna dari UserController
+                              // Name
                               Obx(
                                 () => Text(
                                   'Welcome, ${userController.currentUser.value?.username ?? 'Tamu'}',
@@ -88,7 +85,7 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                               const SizedBox(height: 4),
-                              // Tampilan lokasi dengan status loading
+                              // Location
                               Row(
                                 children: [
                                   const Icon(
@@ -135,7 +132,7 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 ),
-                // --- MERGE: Fitur 4 -> Search bar yang lebih rapi ---
+                // Search bar
                 bottom: PreferredSize(
                   preferredSize: const Size.fromHeight(25),
                   child: Padding(
@@ -162,7 +159,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
 
-              // --- MERGE: Judul seksi "Promo" langsung di sini ---
+              // Header Section1
               SliverToBoxAdapter(
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(
@@ -193,7 +190,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
 
-              // --- MERGE: Daftar makanan horizontal "Promo" langsung di sini ---
+              // List section1
               Obx(() {
                 if (foodController.isLoading.value &&
                     foodController.foodList.isEmpty) {
@@ -220,7 +217,7 @@ class _HomePageState extends State<HomePage> {
                 );
               }),
 
-              // --- MERGE: Judul seksi "Rekomendasi" langsung di sini ---
+              // Header vertical
               SliverToBoxAdapter(
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(
@@ -251,7 +248,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
 
-              // --- MERGE: Daftar vertikal dengan loading & empty state dari AI ---
+              // List vertical
               Obx(() {
                 if (foodController.isLoading.value) {
                   return const SliverToBoxAdapter(
@@ -278,7 +275,8 @@ class _HomePageState extends State<HomePage> {
                 return SliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
                     final food = foodController.foodList[index];
-                    return _buildCardVertical(foodData: food);
+                    final user = foodController.getVendorForFood(food);
+                    return _buildCardVertical(foodData: food, userData: user);
                   }, childCount: foodController.foodList.length),
                 );
               }),
@@ -289,8 +287,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // --- MERGE: Meng-upgrade _buildCardVertical dengan versi AI yang lebih baik ---
-  Widget _buildCardVertical({required Food foodData}) {
+  Widget _buildCardVertical({required Food foodData, required User userData}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Material(
@@ -302,32 +299,152 @@ class _HomePageState extends State<HomePage> {
           borderRadius: BorderRadius.circular(20),
           onTap: () {
             Get.bottomSheet(
-              isScrollControlled: true,
-              Container(
-                height: 300,
-                width: double.maxFinite,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                  ),
-                ),
-                child: Column(
-                  children: const [
-                    Text(
-                      'Ini Bottom Sheet!',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+              DraggableScrollableSheet(
+                initialChildSize: 0.7,
+                minChildSize: 0.4,
+                maxChildSize: 0.95,
+                snap: true,
+                builder: (context, scrollController) {
+                  return Stack(
+                    children: [
+                      SingleChildScrollView(
+                        controller: scrollController,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 30),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20),
+                            ),
+                          ),
+                          child: Container(
+                            color: Colors.white,
+                            child: Column(
+                              children: [
+                                SizedBox(height: 40),
+                                Container(
+                                  height: 250,
+                                  child: ClipRRect(
+                                    borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(20),
+                                      topRight: Radius.circular(20),
+                                    ),
+                                    child: Image.network(
+                                      foodData.imageUrl.toString(),
+                                      height: 150,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder:
+                                          (context, child, progress) =>
+                                              progress == null
+                                                  ? child
+                                                  : const SizedBox(
+                                                    height: 150,
+                                                    child: Center(
+                                                      child:
+                                                          CircularProgressIndicator(),
+                                                    ),
+                                                  ),
+                                      errorBuilder:
+                                          (
+                                            context,
+                                            error,
+                                            stack,
+                                          ) => Image.asset(
+                                            'assets/images/food_loading_image.png',
+                                            height: 150,
+                                            width: double.infinity,
+                                            fit: BoxFit.cover,
+                                          ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      foodData.name,
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 6),
+                                    Container(
+                                      height: 10,
+                                      width: 30,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color:Colors.green, 
+                                          width: 2.0, 
+                                        ),
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      child: Text(
+                                        foodData.pickupStart.
+                                      ),
+                                    ),
+                                    SizedBox(height: 10),
+                                    SizedBox(
+                                      height: 40,
+                                      child: Row(
+                                        children: [
+                                          CircleAvatar(
+                                            maxRadius: 15,
+                                            child: Image.network(
+                                              user.,
+                                              fit: BoxFit.cover,
+                                              errorBuilder:
+                                                  (
+                                                    context,
+                                                    error,
+                                                    stack,
+                                                  ) => Image.asset(
+                                                    'assets/images/food_loading_image.png',
+                                                    height: 150,
+                                                    width: double.infinity,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                            ),
+                                          ),
+                                          SizedBox(width: 20),
+                                          Text(
+                                            'Nama Resto',
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(height: 16),
+                                    Text(
+                                      foodData.description,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.grey.shade400,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 400,
+                                    ), // Ini hanya untuk simulasi konten panjang
+                                    Text("Konten paling bawah."),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 20),
-                    Text('Kamu bisa taruh apa aja di sini.'),
-                  ],
-                ),
+                    ],
+                  );
+                },
               ),
-              // Opsi tambahan (opsional)
+              isScrollControlled: true,
             );
           },
           child: Column(
@@ -460,7 +577,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // --- MERGE: Meng-upgrade _buildCardHorizontal dengan versi AI yang lebih baik ---
   Widget _buildCardHorizontal({required Food foodData}) {
     return Container(
       width: 200, // Sedikit diperlebar agar lebih proporsional
@@ -486,7 +602,6 @@ class _HomePageState extends State<HomePage> {
                       topRight: Radius.circular(20),
                     ),
                     child: Image.network(
-                      // Null-safe check, jika null pakai gambar placeholder
                       foodData.imageUrl.toString(),
                       height: 120,
                       width: double.infinity,
