@@ -242,4 +242,6 @@ class UserController extends GetxController {
   bool isLoggedIn() {
     return currentUser.value != null;
   }
+
+  
 }

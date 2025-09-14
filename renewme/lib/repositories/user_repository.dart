@@ -72,16 +72,12 @@ class UserRepository {
     return null;
   }
   
-  // --- Operasi CRUD Data Profil Pengguna ---
 
-  /// Memperbarui data profil pengguna.
-  /// Ini adalah operasi 'Update'.
   Future<void> updateUser(User user) async {
     await _firestoreService.saveUser(user);
   }
 
-  /// Menghapus akun pengguna dan data profilnya.
-  /// Ini adalah operasi 'Delete' yang menggabungkan dua layanan.
+
   Future<void> deleteUserAccount() async {
     final uid = _authService.getCurrentUserId();
     if (uid!= null) {
@@ -90,5 +86,10 @@ class UserRepository {
       // Kemudian, hapus akun pengguna dari Firebase Auth.
       await _authService.deleteAuthUser();
     }
+  }
+
+  Future<User?> getUserById(String uid) {
+
+    return _firestoreService.getUser(uid);
   }
 }

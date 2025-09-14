@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:renewme/models/food.dart';
 import 'package:renewme/repositories/food_repository.dart';
 import 'package:renewme/controllers/user_controller.dart';
+import 'package:renewme/models/user.dart';
+import 'package:renewme/repositories/user_repository.dart';
 
 
 class FoodWithDistance {
@@ -16,6 +18,8 @@ class FoodController extends GetxController {
   final FoodRepository _foodRepository = Get.find<FoodRepository>();
 
   final UserController _userController = Get.find<UserController>();
+
+  final UserRepository _userRepository = Get.find<UserRepository>();
 
   // variabel reaktif
   final RxList<Food> foodList = <Food>[].obs;
@@ -177,5 +181,17 @@ class FoodController extends GetxController {
       return '${distanceInKm.toStringAsFixed(1)} km'; 
     }
     return '-- km';
+  }
+
+  Future<User?> getVendorForFood(Food food) async {
+    try {
+      // Memanggil repository pengguna untuk mendapatkan data berdasarkan vendorId
+      final vendor = await _userRepository.getUserById(food.vendorId);
+      return vendor;
+    } catch (e) {
+      print("Error fetching vendor for food ${food.id}: $e");
+      Get.snackbar('Error', 'Gagal mendapatkan data penjual.');
+      return null;
+    }
   }
 }
