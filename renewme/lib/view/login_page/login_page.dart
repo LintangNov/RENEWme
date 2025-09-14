@@ -5,20 +5,31 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:renewme/view/login_page/register_page.dart';
 import 'package:renewme/controllers/user_controller.dart';
 
-class LoginPage extends StatelessWidget {
-  LoginPage({super.key});
+// 1. Ubah menjadi StatefulWidget
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
-  // Buat GlobalKey untuk Form
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  // 2. Pindahkan semua controller dan key ke sini (State)
+  final UserController userController = Get.find<UserController>();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  // 3. Tambahkan dispose untuk membersihkan controller
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Pindahkan semua controller ke dalam build method
-    final UserController userController = Get.find<UserController>();
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
-
-    // Variabel ukuran layar
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
     final double horizontalPadding = screenWidth * 0.1;
@@ -31,24 +42,18 @@ class LoginPage extends StatelessWidget {
         child: Stack(
           children: [
             SizedBox.expand(
-              child: SvgPicture.asset(
-                'assets/images/background.svg',
-                fit: BoxFit.cover,
-              ),
+              child: SvgPicture.asset('assets/images/background.svg', fit: BoxFit.cover),
             ),
             LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
-                    ),
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
                     child: IntrinsicHeight(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          // Header
-                          Container(
+                            Container(
                             width: screenWidth,
                             height: screenHeight * 0.25,
                             padding: EdgeInsets.symmetric(
@@ -78,13 +83,8 @@ class LoginPage extends StatelessWidget {
                               ],
                             ),
                           ),
-                          // Area form
                           Container(
-                            height: screenHeight * 0.6,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: horizontalPadding,
-                              vertical: horizontalPadding,
-                            ),
+                            padding: EdgeInsets.all(horizontalPadding),
                             decoration: const BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.only(
@@ -99,82 +99,36 @@ class LoginPage extends StatelessWidget {
                                 children: [
                                   TextFormField(
                                     controller: emailController,
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(15),
-                                      ),
-                                      contentPadding: EdgeInsets.symmetric(
-                                        horizontal: horizontalPadding * 0.5,
-                                        vertical: horizontalPadding * 0.5,
-                                      ),
-                                      labelText: 'Email',
-                                      prefixIcon: Icon(Icons.email),
-                                    ),
+                                    decoration: const InputDecoration(labelText: 'Email', prefixIcon: Icon(Icons.email), border: OutlineInputBorder()),
                                     keyboardType: TextInputType.emailAddress,
-
                                     validator: (value) {
-                                      if (value == null ||
-                                          !GetUtils.isEmail(value)) {
-                                        return 'Format email tidak valid';
-                                      }
+                                      if (value == null || !GetUtils.isEmail(value)) return 'Format email tidak valid';
                                       return null;
                                     },
                                   ),
                                   SizedBox(height: screenHeight * 0.03),
-                                  Obx(
-                                    () => TextFormField(
-                                      enableInteractiveSelection: true,
-
-                                      controller: passwordController,
-                                      obscureText:
-                                          userController.isHidePassword.value,
-                                      decoration: InputDecoration(
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            15,
+                                  Obx(() => TextFormField(
+                                        controller: passwordController,
+                                        obscureText: userController.isHidePassword.value,
+                                        decoration: InputDecoration(
+                                          labelText: 'Password',
+                                          prefixIcon: const Icon(Icons.lock),
+                                          border: const OutlineInputBorder(),
+                                          suffixIcon: IconButton(
+                                            icon: Icon(userController.isHidePassword.value ? Icons.visibility_off : Icons.visibility),
+                                            onPressed: userController.changePasswordVisibility,
                                           ),
                                         ),
-                                        contentPadding: EdgeInsets.symmetric(
-                                          horizontal: horizontalPadding * 0.5,
-                                          vertical: horizontalPadding * 0.5,
-                                        ),
-                                        labelText: 'Password',
-                                        prefixIcon: const Icon(Icons.lock),
-                                        suffixIcon: IconButton(
-                                          icon: Icon(
-                                            userController.isHidePassword.value
-                                                ? Icons.visibility_off
-                                                : Icons.visibility,
-                                          ),
-                                          onPressed:
-                                              userController
-                                                  .changePasswordVisibility,
-                                        ),
-                                      ),
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Password tidak boleh kosong';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                  ),
-
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) return 'Password tidak boleh kosong';
+                                          return null;
+                                        },
+                                      )),
                                   Obx(() {
-                                    if (userController
-                                        .errorMessage
-                                        .isNotEmpty) {
+                                    if (userController.errorMessage.isNotEmpty) {
                                       return Padding(
-                                        padding: const EdgeInsets.only(
-                                          top: 16.0,
-                                        ),
-                                        child: Text(
-                                          userController.errorMessage.value,
-                                          style: const TextStyle(
-                                            color: Colors.red,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
+                                        padding: const EdgeInsets.only(top: 16.0),
+                                        child: Text(userController.errorMessage.value, style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
                                       );
                                     }
                                     return const SizedBox.shrink();
@@ -182,47 +136,22 @@ class LoginPage extends StatelessWidget {
                                   SizedBox(height: screenHeight * 0.05),
                                   SizedBox(
                                     width: double.infinity,
-                                    height: screenHeight * 0.07,
-                                    child: Obx(
-                                      () => ElevatedButton(
-                                        onPressed:
-                                            userController.isLoading.value
-                                                ? null
-                                                : () async {
-                                                  userController
-                                                      .errorMessage
-                                                      .value = '';
-                                                  if (formKey.currentState!
-                                                      .validate()) {
-                                                    await userController.signIn(
-                                                      email:
-                                                          emailController.text,
-                                                      password:
-                                                          passwordController
-                                                              .text,
-                                                    );
-                                                  }
-                                                },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color(
-                                            0xFF53B675,
-                                          ),
-                                        ),
-                                        child:
-                                            userController.isLoading.value
-                                                ? const CircularProgressIndicator(
-                                                  color: Colors.white,
-                                                )
-                                                : const Text(
-                                                  'Login',
-                                                  style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                      ),
-                                    ),
+                                    height: 50,
+                                    child: Obx(() => ElevatedButton(
+                                          onPressed: userController.isLoading.value ? null : () async {
+                                            userController.errorMessage.value = '';
+                                            if (formKey.currentState!.validate()) {
+                                              await userController.signIn(
+                                                email: emailController.text,
+                                                password: passwordController.text,
+                                              );
+                                            }
+                                          },
+                                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF53B675)),
+                                          child: userController.isLoading.value
+                                              ? const CircularProgressIndicator(color: Colors.white)
+                                              : const Text('Login', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                                        )),
                                   ),
                                   SizedBox(height: screenHeight * 0.02),
                                   Row(
@@ -230,17 +159,8 @@ class LoginPage extends StatelessWidget {
                                     children: [
                                       const Text('Belum punya akun?'),
                                       TextButton(
-                                        onPressed:
-                                            () => Get.to(
-                                              () => const RegisterPage(),
-                                            ),
-                                        child: const Text(
-                                          'Register',
-                                          style: TextStyle(
-                                            color: Color(0xFF53B675),
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
+                                        onPressed: () => Get.to(() => const RegisterPage()),
+                                        child: const Text('Register', style: TextStyle(color: Color(0xFF53B675), fontWeight: FontWeight.bold)),
                                       ),
                                     ],
                                   ),

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:renewme/controllers/food_controller.dart';
-import 'package:renewme/controllers/search_page_controller.dart';
+// 1. Pastikan Anda mengimpor file controller yang benar
+import 'package:renewme/controllers/search_page_controller.dart'; 
 import 'package:renewme/models/food.dart';
 
 
@@ -10,46 +11,39 @@ class SearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Gunakan Get.put() agar SearchController dibuat khusus untuk halaman ini
-    final SearchPageController searchPageController = Get.put(SearchPageController());
-    // Gunakan Get.find() untuk FoodController yang sudah ada
+    // 2. Inisialisasi SearchPageController Anda dengan benar
+    final SearchPageController searchController = Get.put(SearchPageController());
     final FoodController foodController = Get.find<FoodController>();
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pencarian'),
-        // Tombol kembali secara otomatis ditambahkan oleh GetX saat navigasi
       ),
       body: Column(
         children: [
-          // 1. Bagian Search Bar
-          _buildSearchBar(searchPageController),
+          // 3. Kirim controller yang benar ke helper method
+          _buildSearchBar(searchController),
 
-          // 2. Bagian Tombol Filter/Sorting
           _buildFilterButtons(foodController),
 
           const Divider(height: 1),
 
-          // 3. Bagian Konten Dinamis (Riwayat atau Hasil Pencarian)
           Expanded(
             child: Obx(() {
-              // Jika query di TextField kosong, tampilkan riwayat
-              if (searchPageController.textController.text.isEmpty) {
-                return _buildSearchHistory(searchPageController);
+              // 4. Gunakan variabel controller yang benar di semua logika
+              if (searchController.textController.text.isEmpty) {
+                return _buildSearchHistory(searchController);
               }
               
-              // Jika sedang loading/debounce, tampilkan spinner
-              if (foodController.isLoading.value || (searchPageController.isSearching.value && searchPageController.searchResultList.isEmpty)) {
+              if (foodController.isLoading.value || (searchController.isSearching.value && searchController.searchResultList.isEmpty)) {
                 return const Center(child: CircularProgressIndicator());
               }
               
-              // Jika tidak ada hasil, tampilkan pesan
-              if (searchPageController.searchResultList.isEmpty) {
+              if (searchController.searchResultList.isEmpty) {
                 return const Center(child: Text('Makanan tidak ditemukan.'));
               }
 
-              // Jika ada hasil, tampilkan daftar hasil pencarian
-              return _buildSearchResults(searchPageController);
+              return _buildSearchResults(searchController);
             }),
           ),
         ],
@@ -57,7 +51,7 @@ class SearchPage extends StatelessWidget {
     );
   }
 
-  // Widget untuk Search Bar
+  // 5. Perbaiki tipe parameter di semua helper method
   Widget _buildSearchBar(SearchPageController controller) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -79,7 +73,6 @@ class SearchPage extends StatelessWidget {
     );
   }
   
-  // Widget untuk tombol-tombol filter
   Widget _buildFilterButtons(FoodController controller) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -109,7 +102,6 @@ class SearchPage extends StatelessWidget {
     );
   }
 
-  // Widget untuk menampilkan Riwayat Pencarian
   Widget _buildSearchHistory(SearchPageController controller) {
     if (controller.searchHistory.isEmpty) {
       return const Center(child: Text('Ketik untuk mulai mencari makanan.'));
@@ -117,9 +109,18 @@ class SearchPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Text('Riwayat Pencarian', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Riwayat Pencarian', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              TextButton(
+                onPressed: controller.clearHistory,
+                child: const Text('Hapus'),
+              ),
+            ],
+          ),
         ),
         Expanded(
           child: ListView.builder(
@@ -142,26 +143,22 @@ class SearchPage extends StatelessWidget {
     );
   }
   
-  // Widget untuk menampilkan Hasil Pencarian
   Widget _buildSearchResults(SearchPageController controller) {
     return ListView.builder(
       itemCount: controller.searchResultList.length,
       itemBuilder: (context, index) {
         final Food food = controller.searchResultList[index];
-        // Ini adalah layout list item seperti di gambar Anda
         return _buildFoodListItem(food);
       },
     );
   }
   
-  // Widget untuk satu item makanan dalam daftar hasil
   Widget _buildFoodListItem(Food food) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Gambar Makanan (Placeholder)
           Container(
             width: 80,
             height: 80,
@@ -180,7 +177,6 @@ class SearchPage extends StatelessWidget {
                 : null,
           ),
           const SizedBox(width: 16),
-          // Kolom untuk Teks (Nama, Deskripsi, Harga)
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

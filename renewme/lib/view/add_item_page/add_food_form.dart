@@ -135,7 +135,17 @@ class _AddFoodPageState extends State<AddFoodPage> {
 
               // Tombol untuk menyimpan data ke Firestore.
               ElevatedButton(
-                onPressed: _saveFood,
+                onPressed: (){
+                  _saveFood();
+                  if(foodController.errorMessage.isEmpty){
+                    _nameController.clear();
+                  _descriptionController.clear();
+                  _priceController.clear();
+                  _quantityController.clear();
+                  _selectedExpiryDate = null;
+                  }
+                  },
+                  
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   textStyle: const TextStyle(
