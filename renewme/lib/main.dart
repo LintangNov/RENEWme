@@ -45,7 +45,7 @@ class MainApp extends StatelessWidget {
         textTheme: GoogleFonts.poppinsTextTheme(),
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Color(0xFF5ABE79),
+          seedColor: Color.fromARGB(255, 192, 192, 192),
         ).copyWith( 
           primary: Color(0xFF5ABE79),
           secondaryContainer: Color(0xFFDFF1DB),

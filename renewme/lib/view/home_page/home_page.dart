@@ -44,7 +44,6 @@ class _HomePageState extends State<HomePage> {
         bottom: true,
         child: CustomScrollView(
           slivers: [
-            // Ganti semua header-mu sebelumnya dengan SATU SliverAppBar ini
             SliverAppBar(
               pinned: true,
               backgroundColor: Theme.of(context).colorScheme.primary,

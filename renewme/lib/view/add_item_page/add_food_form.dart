@@ -34,8 +34,8 @@ class _AddFoodPageState extends State<AddFoodPage> {
       body: SingleChildScrollView(
         child: Container(
           margin: const EdgeInsets.all(10),
-          padding: EdgeInsets.all(5),
-          decoration: BoxDecoration(color: Colors.yellow, borderRadius: BorderRadius.circular(15),),
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15),),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -50,7 +50,6 @@ class _AddFoodPageState extends State<AddFoodPage> {
               const SizedBox(height: 8,),
               // nama makanan.
               Container(
-
                 child: TextField(
                   controller: _nameController,
                   decoration: InputDecoration(
@@ -107,10 +106,14 @@ class _AddFoodPageState extends State<AddFoodPage> {
 
               // Baris untuk menampilkan dan memilih tanggal kedaluwarsa.
               const Text(
-                'Tanggal Kedaluwarsa',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                "Tanggal Kesaluwarsa",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 8,),
               OutlinedButton.icon(
                 icon: const Icon(Icons.calendar_today),
                 label: Text(
