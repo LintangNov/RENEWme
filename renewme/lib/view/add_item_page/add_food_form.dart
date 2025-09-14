@@ -5,7 +5,6 @@ import 'package:renewme/controllers/food_controller.dart';
 import 'package:renewme/controllers/user_controller.dart';
 import 'package:renewme/models/food.dart';
 
-/// Halaman Form untuk Menambah Data Makanan Baru.
 class AddFoodPage extends StatefulWidget {
   const AddFoodPage({super.key});
 
@@ -14,146 +13,87 @@ class AddFoodPage extends StatefulWidget {
 }
 
 class _AddFoodPageState extends State<AddFoodPage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final FoodController foodController = Get.find<FoodController>();
+  final UserController userController = Get.find<UserController>();
+
   // Controller untuk setiap input field di form.
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
   final _quantityController = TextEditingController();
 
-  // Variabel state untuk menyimpan tanggal kedaluwarsa yang dipilih.
-  DateTime? _selectedExpiryDate;
+  // --- PERUBAHAN: Variabel state untuk rentang waktu pengambilan ---
+  DateTime? _selectedPickupStart;
+  DateTime? _selectedPickupEnd;
 
-  // Mengambil instance FoodController yang dikelola oleh GetX.
-  final FoodController foodController = Get.find<FoodController>();
-  final UserController userController = Get.find<UserController>();
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _descriptionController.dispose();
+    _priceController.dispose();
+    _quantityController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Tambah Makanan Baru")),
       body: SingleChildScrollView(
-        child: Container(
-          margin: const EdgeInsets.all(10),
-          padding: EdgeInsets.all(10),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15),),
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
-                "Deskripsi ",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w900,
-                ),
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: 'Nama Makanan', border: OutlineInputBorder()),
+                validator: (value) => (value == null || value.isEmpty) ? 'Nama tidak boleh kosong' : null,
               ),
-              const SizedBox(height: 8,),
-              // nama makanan.
-              Container(
-                child: TextField(
-                  controller: _nameController,
-                  decoration: InputDecoration(
-                    labelText: 'Nama Makanan',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    prefixIcon: Icon(Icons.fastfood),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // deskripsi.
-              TextField(
+              const SizedBox(height: 16),
+              TextFormField(
                 controller: _descriptionController,
-                decoration: InputDecoration(
-                  labelText: 'Deskripsi',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  prefixIcon: Icon(Icons.description),
-                ),
+                decoration: const InputDecoration(labelText: 'Deskripsi', border: OutlineInputBorder()),
+                validator: (value) => (value == null || value.isEmpty) ? 'Deskripsi tidak boleh kosong' : null,
               ),
               const SizedBox(height: 16),
-
-              // harga.
-              TextField(
+              TextFormField(
                 controller: _priceController,
-                decoration: InputDecoration(
-                  labelText: 'Harga (Rupiah)',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  prefixIcon: Icon(Icons.attach_money_rounded),
-                ),
+                decoration: const InputDecoration(labelText: 'Harga (Rupiah)', border: OutlineInputBorder()),
                 keyboardType: TextInputType.number,
+                validator: (value) => (value == null || value.isEmpty) ? 'Harga tidak boleh kosong' : null,
               ),
               const SizedBox(height: 16),
-
-              // kuantitas/stok.
-              TextField(
+              TextFormField(
                 controller: _quantityController,
-                decoration: InputDecoration(
-                  labelText: 'Kuantitas / Sisa',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  prefixIcon: Icon(Icons.inventory),
-                ),
+                decoration: const InputDecoration(labelText: 'Kuantitas / Sisa', border: OutlineInputBorder()),
                 keyboardType: TextInputType.number,
+                validator: (value) => (value == null || value.isEmpty) ? 'Kuantitas tidak boleh kosong' : null,
               ),
               const SizedBox(height: 24),
 
-              // Baris untuk menampilkan dan memilih tanggal kedaluwarsa.
-              const Text(
-                "Tanggal Kesaluwarsa",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              const SizedBox(height: 8,),
+              // --- PERUBAHAN: Dua tombol untuk memilih rentang waktu ---
+              const Text("Waktu Mulai Pengambilan", style: TextStyle(fontWeight: FontWeight.bold)),
               OutlinedButton.icon(
                 icon: const Icon(Icons.calendar_today),
-                label: Text(
-                  _selectedExpiryDate == null
-                      ? 'Pilih Tanggal & Waktu'
-                      // Format tanggal agar mudah dibaca oleh pengguna.
-                      : DateFormat(
-                        'dd MMMM yyyy, HH:mm',
-                      ).format(_selectedExpiryDate!),
-                ),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  alignment: Alignment.centerLeft,
-                  textStyle: const TextStyle(fontSize: 16),
-                ),
-                onPressed: _pickExpiryDateTime,
+                label: Text(_selectedPickupStart == null ? 'Pilih Tanggal & Waktu' : DateFormat('dd MMM yyyy, HH:mm').format(_selectedPickupStart!)),
+                onPressed: _pickPickupStart,
+              ),
+              const SizedBox(height: 16),
+              const Text("Waktu Selesai Pengambilan", style: TextStyle(fontWeight: FontWeight.bold)),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.calendar_today),
+                label: Text(_selectedPickupEnd == null ? 'Pilih Tanggal & Waktu' : DateFormat('dd MMM yyyy, HH:mm').format(_selectedPickupEnd!)),
+                onPressed: _pickPickupEnd,
               ),
               const SizedBox(height: 32),
-
-              // Tombol untuk menyimpan data ke Firestore.
+              
               ElevatedButton(
-                onPressed: (){
-                  _saveFood();
-                  if(foodController.errorMessage.isEmpty){
-                    _nameController.clear();
-                  _descriptionController.clear();
-                  _priceController.clear();
-                  _quantityController.clear();
-                  _selectedExpiryDate = null;
-                  }
-                  },
-                  
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  textStyle: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                child: const Text("Simpan Makanan"),
+                onPressed: _saveFood,
+                style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
+                child: const Text("Simpan Makanan", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -162,26 +102,41 @@ class _AddFoodPageState extends State<AddFoodPage> {
     );
   }
 
-  /// Fungsi untuk memicu dialog pemilihan tanggal dan waktu.
-  Future<void> _pickExpiryDateTime() async {
-    // Panggil helper method untuk menampilkan dialog.
-    final selectedDateTime = await _selectExpiryDateTime(context);
-
-    // Jika pengguna memilih tanggal (tidak membatalkan), update state.
+  /// Memilih waktu mulai pengambilan.
+  Future<void> _pickPickupStart() async {
+    final selectedDateTime = await _selectDateTime(context, initialDate: DateTime.now(), firstDate: DateTime.now());
     if (selectedDateTime != null) {
       setState(() {
-        _selectedExpiryDate = selectedDateTime;
+        _selectedPickupStart = selectedDateTime;
+        // Jika waktu selesai lebih awal dari waktu mulai yang baru, reset waktu selesai.
+        if (_selectedPickupEnd != null && _selectedPickupEnd!.isBefore(_selectedPickupStart!)) {
+          _selectedPickupEnd = null;
+        }
+      });
+    }
+  }
+
+  /// Memilih waktu selesai pengambilan.
+  Future<void> _pickPickupEnd() async {
+    if (_selectedPickupStart == null) {
+      Get.snackbar('Perhatian', 'Silakan pilih waktu mulai terlebih dahulu.');
+      return;
+    }
+    final selectedDateTime = await _selectDateTime(context, initialDate: _selectedPickupStart!, firstDate: _selectedPickupStart!);
+    if (selectedDateTime != null) {
+      setState(() {
+        _selectedPickupEnd = selectedDateTime;
       });
     }
   }
 
   /// Fungsi yang dipanggil saat tombol "Simpan Makanan" ditekan.
   void _saveFood() {
-    // 1. Validasi input: pastikan field yang wajib diisi tidak kosong.
-    if (_nameController.text.isEmpty || _selectedExpiryDate == null) {
+    // 1. Validasi semua input form.
+    if (!_formKey.currentState!.validate() || _selectedPickupStart == null || _selectedPickupEnd == null) {
       Get.snackbar(
         "Input Tidak Lengkap",
-        "Nama dan tanggal kedaluwarsa wajib diisi.",
+        "Semua field, termasuk waktu mulai dan selesai, wajib diisi.",
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -196,41 +151,37 @@ class _AddFoodPageState extends State<AddFoodPage> {
       description: _descriptionController.text,
       priceInRupiah: int.tryParse(_priceController.text) ?? 0,
       quantity: int.tryParse(_quantityController.text) ?? 1,
-      expiryDate: _selectedExpiryDate!,
-      imageUrl: '', // Anda bisa menambahkan input untuk URL gambar nanti.
+      imageUrl: '', 
       vendorId: userController.currentUser.value!.id,
       location: userController.currentUser.value!.location!,
+      // --- PERUBAHAN: Gunakan pickupStart dan pickupEnd ---
+      pickupStart: _selectedPickupStart!,
+      pickupEnd: _selectedPickupEnd!,
     );
 
     // 3. Panggil method addFood dari controller untuk menyimpan data.
     foodController.addFood(newFood);
-
-    // 4. Kembali ke halaman sebelumnya setelah data berhasil disimpan.
-    Get.back();
   }
 }
 
-/// Helper method di luar class State untuk menampilkan dialog tanggal dan waktu.
-Future<DateTime?> _selectExpiryDateTime(BuildContext context) async {
-  // Tampilkan dialog untuk memilih tanggal.
+/// Helper method untuk menampilkan dialog tanggal dan waktu.
+Future<DateTime?> _selectDateTime(BuildContext context, {required DateTime initialDate, required DateTime firstDate}) async {
   final DateTime? pickedDate = await showDatePicker(
     context: context,
-    initialDate: DateTime.now(),
-    firstDate: DateTime.now(), // Tanggal paling awal adalah hari ini.
+    initialDate: initialDate,
+    firstDate: firstDate,
     lastDate: DateTime(2101),
   );
 
-  if (pickedDate == null) return null; // Pengguna membatalkan.
+  if (pickedDate == null) return null;
 
-  // Tampilkan dialog untuk memilih waktu.
   final TimeOfDay? pickedTime = await showTimePicker(
     context: context,
-    initialTime: TimeOfDay.fromDateTime(DateTime.now()),
+    initialTime: TimeOfDay.fromDateTime(initialDate),
   );
 
-  if (pickedTime == null) return null; // Pengguna membatalkan.
+  if (pickedTime == null) return null;
 
-  // Gabungkan hasil tanggal dan waktu menjadi satu objek DateTime.
   return DateTime(
     pickedDate.year,
     pickedDate.month,
