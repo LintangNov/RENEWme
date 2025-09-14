@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:renewme/controllers/user_controller.dart';
-import 'package:renewme/view/dashboard_page.dart';
 import 'package:renewme/view/login_page/login_page.dart'; // Sesuaikan path import
 
 // 1. Ganti dari StatefulWidget menjadi StatelessWidget dan extends GetView<UserController>

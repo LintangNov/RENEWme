@@ -75,9 +75,9 @@ class UserController extends GetxController {
       );
       if (newUser != null) {
         currentUser.value = newUser;
-        await updateUserLocation();
         // ke halaman utama
         Get.offAll(() => DashboardPage());
+        await updateUserLocation();
       }
     } catch (e) {
       errorMessage.value = 'Gagal mendaftar. Silakan coba lagi.';
@@ -95,9 +95,9 @@ class UserController extends GetxController {
       final user = await _userRepository.signIn(email, password);
       if (user != null) {
         currentUser.value = user;
-        await updateUserLocation();
         // ke halaman utama
         Get.offAll(() => DashboardPage());
+        await updateUserLocation();
       }
     } catch (e) {
       errorMessage.value = 'Login gagal. Cek email dan kata sandi Anda.';
