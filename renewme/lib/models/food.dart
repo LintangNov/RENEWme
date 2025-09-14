@@ -30,7 +30,7 @@ class Food {
       id: doc.id,
       name: data['name'] ?? '',
       description: data['description'] ?? '',
-      imageUrl: data['imageUrl'] ?? 'assets/images/food_loading.png',
+      imageUrl: data['imageUrl'] ?? 'assets/images/food_loading_image.png',
       expiryDate: (data['expiryDate'] as Timestamp).toDate(),
       quantity: data['quantity'] ?? 1,
       priceInRupiah: data['priceInRupiah'] ?? 0,

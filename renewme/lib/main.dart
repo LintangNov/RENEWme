@@ -38,12 +38,13 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'RenewMe',
       theme: ThemeData(
         textTheme: GoogleFonts.poppinsTextTheme(),
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Color.fromARGB(255, 192, 192, 192),
+          seedColor: Color.fromARGB(255, 194, 194, 194),
         ).copyWith( 
           primary: Color(0xFF5ABE79),
           secondaryContainer: Color(0xFFDFF1DB),
