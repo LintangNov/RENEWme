@@ -21,15 +21,11 @@ class MapController extends GetxController {
   void onInit() {
     super.onInit();
     
-    // Menyiapkan data awal saat controller pertama kali dimuat.
     _prepareMapData();
 
-    // Menggunakan `ever` untuk mendengarkan perubahan pada foodList.
-    // Ini akan membuat peta selalu update secara real-time.
     ever(_foodController.foodList, (_) => _rebuildMarkers());
   }
 
-  /// Menyiapkan data awal peta, terutama posisi tengah kamera.
   void _prepareMapData() {
     isLoading.value = true;
     // Jika lokasi user ada, gunakan itu sebagai titik tengah.
@@ -67,7 +63,6 @@ class MapController extends GetxController {
       );
     }
 
-    // 3. Update state markers agar UI ikut berubah.
     markers.assignAll(foodMarkers);
   }
 

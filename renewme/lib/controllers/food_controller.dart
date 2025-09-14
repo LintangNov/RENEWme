@@ -102,20 +102,19 @@ class FoodController extends GetxController {
   void sortFoodsByPrice({bool ascending = true}) {
     foodList.sort((a, b) {
       if (ascending) {
-        return a.priceInRupiah.compareTo(b.priceInRupiah); // Termurah ke termahal
+        return a.priceInRupiah.compareTo(b.priceInRupiah); 
       } else {
-        return b.priceInRupiah.compareTo(a.priceInRupiah); // Termahal ke termurah
+        return b.priceInRupiah.compareTo(a.priceInRupiah); 
       }
     });
   }
 
   Future<void> sortFoodsByDistance() async {
-    // 1. Cek apakah lokasi pengguna sudah ada.
+ 
     if (_userController.userPosition.value == null) {
-      // 2. Jika tidak ada, panggil method di UserController untuk mendapatkannya.
+   
       await _userController.updateUserLocation();
       
-      // 3. Cek sekali lagi. Jika masih null (misalnya, pengguna menolak izin), hentikan proses.
       if (_userController.userPosition.value == null) {
         Get.snackbar('Lokasi Dibutuhkan', 'Izin lokasi diperlukan untuk fitur ini.');
         return;
@@ -125,10 +124,9 @@ class FoodController extends GetxController {
     try {
       isLoading.value = true;
 
-      // 4. Langsung gunakan lokasi dari UserController
       final Position userPosition = _userController.userPosition.value!;
 
-      // Proses sorting tetap sama, tapi tidak perlu lagi memanggil service lokasi
+      
       final List<FoodWithDistance> foodsWithDistances = foodList.map((food) {
         final double distance = Geolocator.distanceBetween(
           userPosition.latitude,
@@ -160,5 +158,24 @@ class FoodController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  String getFoodDistanceString(Food food) {
+    
+    if (_userController.userPosition.value != null) {
+      final userPos = _userController.userPosition.value!;
+      
+      final double distanceInMeters = Geolocator.distanceBetween(
+        userPos.latitude,
+        userPos.longitude,
+        food.location.latitude,
+        food.location.longitude,
+      );
+
+      // Konversi ke kilometer dan format menjadi string.
+      final double distanceInKm = distanceInMeters / 1000;
+      return '${distanceInKm.toStringAsFixed(1)} km'; 
+    }
+    return '-- km';
   }
 }
