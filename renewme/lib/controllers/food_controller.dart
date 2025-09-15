@@ -5,6 +5,7 @@ import 'package:renewme/repositories/food_repository.dart';
 import 'package:renewme/controllers/user_controller.dart';
 import 'package:renewme/models/user.dart';
 import 'package:renewme/repositories/user_repository.dart';
+import 'package:renewme/utils/location_helper.dart';
 
 
 class FoodWithDistance {
@@ -21,6 +22,8 @@ class FoodController extends GetxController {
 
   final UserRepository _userRepository = Get.find<UserRepository>();
 
+
+  final Map<String, String> _addressCache = {};
   // variabel reaktif
   final RxList<Food> foodList = <Food>[].obs;
   final RxBool isLoading = false.obs;
@@ -193,5 +196,21 @@ class FoodController extends GetxController {
       Get.snackbar('Error', 'Gagal mendapatkan data penjual.');
       return null;
     }
+  }
+
+  Future<String> getVendorAddress(Food food) async {
+    final String cacheKey = food.id;
+
+    
+    if (_addressCache.containsKey(cacheKey)) {
+      return _addressCache[cacheKey]!;
+    }
+
+    final String address = await getAddressFromCoordinates(
+      food.location.latitude,
+      food.location.longitude,
+    );
+    _addressCache[cacheKey] = address;
+    return address;
   }
 }
