@@ -275,8 +275,8 @@ class _HomePageState extends State<HomePage> {
                 return SliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
                     final food = foodController.foodList[index];
-                    final user = foodController.getVendorForFood(food);
-                    return _buildCardVertical(foodData: food, userData: user);
+                    // final user = foodController.getVendorForFood(food);
+                    return _buildCardVertical(foodData: food);
                   }, childCount: foodController.foodList.length),
                 );
               }),
@@ -287,7 +287,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildCardVertical({required Food foodData, required User userData}) {
+  Widget _buildCardVertical({required Food foodData}) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Material(
@@ -373,20 +373,19 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     SizedBox(height: 6),
                                     Container(
-                                      height: 10,
-                                      width: 30,
+                                      padding: EdgeInsets.only(left: 10),
+                                      height: 25,
+                                      width: 100,
                                       decoration: BoxDecoration(
                                         border: Border.all(
-                                          color:Colors.green, 
-                                          width: 2.0, 
+                                          color: Colors.green,
+                                          width: 2.0,
                                         ),
-                                        borderRadius: BorderRadius.circular(15),
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
-                                      child: Text(
-                                        foodData.pickupStart.
-                                      ),
+                                      child: Text('pickup'),
                                     ),
-                                    SizedBox(height: 10),
+                                    SizedBox(height: 20),
                                     SizedBox(
                                       height: 40,
                                       child: Row(
@@ -394,7 +393,7 @@ class _HomePageState extends State<HomePage> {
                                           CircleAvatar(
                                             maxRadius: 15,
                                             child: Image.network(
-                                              user.,
+                                              'Nama Vendor',
                                               fit: BoxFit.cover,
                                               errorBuilder:
                                                   (
@@ -437,6 +436,42 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ],
                             ),
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Container(
+                          height: 100,
+                          width: double.maxFinite,
+                          // alignment: Alignment.bottomCenter,
+                          decoration: BoxDecoration(color: Colors.amber),
+                          child: Column(
+                            children: [
+
+                              Container(
+                                // margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                                width: double.infinity,
+                                height: 10,
+                                child: ElevatedButton(
+                                  onPressed: () {},
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF53B675),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'Tambahkan',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
