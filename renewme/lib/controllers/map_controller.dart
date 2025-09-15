@@ -52,7 +52,7 @@ class MapController extends GetxController {
       );
     }).toList();
 
-    // 2. (Bonus) Tambahkan marker untuk lokasi pengguna.
+  
     if (_userController.userPosition.value != null) {
       final userPos = _userController.userPosition.value!;
       foodMarkers.add(
