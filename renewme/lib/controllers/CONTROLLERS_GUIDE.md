@@ -132,7 +132,7 @@
    c. Helper & Data Tambahan
       - `getDistanceStringForFood(Food food)`: Mengambil satu objek Food, menghitung jaraknya dari lokasi pengguna, dan mengembalikan String yang sudah diformat (contoh: "1.2 km"). Berguna untuk ditampilkan di kartu makanan.
 
-      - `getVendorForFood(Food food)` : Mengambil satu objek Food, mencari data penjualnya (vendorId) di database, dan mengembalikan Future<User?>. Berguna untuk menampilkan detail penjual.
+      - `getVendorForFood(Food food)`: Mengambil satu objek Food, mencari data penjualnya (vendorId) di database, dan mengembalikan Future<User?>. Berguna untuk menampilkan detail penjual.
 
 # SEARCH CONTROLLER GUIDE
 

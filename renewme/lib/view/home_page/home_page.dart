@@ -383,7 +383,7 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                         borderRadius: BorderRadius.circular(10),
                                       ),
-                                      child: Text('pickup'),
+                                      child: Text(foodController.getFoodDistanceString(foodData)),
                                     ),
                                     SizedBox(height: 20),
                                     SizedBox(
