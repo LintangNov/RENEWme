@@ -1,36 +1,34 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:renewme/controllers/food_controller.dart';
+import 'package:renewme/controllers/user_controller.dart';
 import 'package:renewme/models/food.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart';
 
 class SearchPageController extends GetxController {
 
   final FoodController _foodController = Get.find<FoodController>();
+    final UserController _userController = Get.find<UserController>();
+
   
-  // Controller untuk text field di UI agar bisa dikontrol dari sini.
   late TextEditingController textController;
 
-  // Variabel reaktif 
   final RxList<Food> searchResultList = <Food>[].obs;
   final RxList<String> searchHistory = <String>[].obs;
   final RxBool isSearching = false.obs;
   
-  // Kunci unik untuk menyimpan data riwayat di SharedPreferences.
   static const _historyKey = 'search_history';
 
   @override
   void onInit() {
     super.onInit();
     textController = TextEditingController();
-    // Memuat riwayat pencarian dari memori saat controller dibuat.
     _loadSearchHistory(); 
   }
 
-  /// Melakukan pencarian berdasarkan query dengan debounce.
   void searchFoods(String query) {
-    // Jika query kosong, bersihkan hasil pencarian dan tampilkan riwayat.
     if (query.isEmpty) {
       searchResultList.clear();
       isSearching.value = false;
@@ -38,55 +36,43 @@ class SearchPageController extends GetxController {
     }
 
     isSearching.value = true;
-    // Debounce: Tunda eksekusi pencarian selama 500ms setelah pengguna berhenti mengetik.
     debounce(
       isSearching,
       (_) {
-        // Ambil daftar makanan utama dari FoodController.
         final masterList = _foodController.foodList;
-        // Lakukan filter berdasarkan nama makanan.
         final results = masterList.where((food) {
           final foodName = food.name.toLowerCase();
           final input = query.toLowerCase();
           return foodName.contains(input);
         }).toList();
-        // Update daftar hasil pencarian.
         searchResultList.assignAll(results);
+        isSearching.value=false;
       },
       time: const Duration(milliseconds: 500),
     );
   }
   
-  /// Menambahkan query ke riwayat pencarian dan menyimpannya.
   void addToHistory(String query) {
     if (query.isEmpty || searchHistory.contains(query)) {
       return;
     }
-    searchHistory.insert(0, query); // Tambahkan ke paling atas.
-    // Batasi riwayat hanya 10 item terakhir.
+    searchHistory.insert(0, query);
     if (searchHistory.length > 10) {
       searchHistory.removeLast();
     }
-    // Simpan riwayat yang sudah diperbarui.
     _saveSearchHistory();
   }
 
-  /// Membersihkan riwayat pencarian.
   void clearHistory() {
     searchHistory.clear();
-    // Hapus juga dari memori.
     _clearSavedHistory();
   }
 
-  // --- Method Internal untuk SharedPreferences ---
-
-  /// Menyimpan daftar `searchHistory` ke memori perangkat.
   Future<void> _saveSearchHistory() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(_historyKey, searchHistory);
   }
 
-  /// Memuat daftar `searchHistory` dari memori perangkat.
   Future<void> _loadSearchHistory() async {
     final prefs = await SharedPreferences.getInstance();
     final savedHistory = prefs.getStringList(_historyKey);
@@ -95,16 +81,67 @@ class SearchPageController extends GetxController {
     }
   }
   
-  /// Menghapus data riwayat dari memori perangkat.
   Future<void> _clearSavedHistory() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_historyKey);
   }
 
-  /// Membersihkan resource saat controller dihapus dari memori.
   @override
   void onClose() {
     textController.dispose();
     super.onClose();
   }
+
+  void sortResultsByPrice({bool ascending = true}) {
+    
+    final listToSort = searchResultList.isNotEmpty ? List<Food>.from(searchResultList) : List<Food>.from(_foodController.foodList);
+
+    listToSort.sort((a, b) {
+      if (ascending) {
+        return a.priceInRupiah.compareTo(b.priceInRupiah);
+      } else {
+        return b.priceInRupiah.compareTo(a.priceInRupiah);
+      }
+    });
+    
+    // Tampilkan hasilnya di searchResultList
+    searchResultList.assignAll(listToSort);
+  }
+
+  /// Mengurutkan hasil pencarian berdasarkan jarak.
+  Future<void> sortResultsByDistance() async {
+    isSearching.value = true; // Gunakan state loading yang sama
+    try {
+      if (_userController.userPosition.value == null) {
+        await _userController.updateUserLocation();
+        if (_userController.userPosition.value == null) {
+          Get.snackbar('Lokasi Dibutuhkan', 'Izin lokasi diperlukan untuk fitur ini.');
+          return;
+        }
+      }
+
+      final Position userPosition = _userController.userPosition.value!;
+      // Tentukan daftar mana yang akan diurutkan
+      final listToSort = searchResultList.isNotEmpty ? List<Food>.from(searchResultList) : List<Food>.from(_foodController.foodList);
+
+      final List<FoodWithDistance> foodsWithDistances = listToSort.map((food) {
+        final double distance = Geolocator.distanceBetween(
+          userPosition.latitude, userPosition.longitude,
+          food.location.latitude, food.location.longitude,
+        );
+        return FoodWithDistance(food: food, distanceInMeters: distance);
+      }).toList();
+
+      foodsWithDistances.sort((a, b) => a.distanceInMeters.compareTo(b.distanceInMeters));
+
+      final sortedFoods = foodsWithDistances.map((item) => item.food).toList();
+      searchResultList.assignAll(sortedFoods);
+
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal mengurutkan berdasarkan jarak.');
+    } finally {
+      isSearching.value = false;
+    }
+  }
 }
+

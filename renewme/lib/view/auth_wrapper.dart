@@ -9,12 +9,12 @@ class AuthWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Ambil instance UserController
+    
     final UserController userController = Get.find<UserController>();
 
-    // Obx akan "mendengarkan" perubahan pada currentUser dan isLoading
+    
     return Obx(() {
-      // Selama proses pengecekan awal, tampilkan layar loading
+    
       if (userController.isLoading.value) {
         return const Scaffold(
           body: Center(
@@ -23,12 +23,12 @@ class AuthWrapper extends StatelessWidget {
         );
       }
 
-      // Setelah selesai, cek apakah ada pengguna yang login
+      
       if (userController.isLoggedIn()) {
-        // Jika ya, langsung arahkan ke DashboardPage
+       
         return const DashboardPage();
       } else {
-        // Jika tidak, arahkan ke LoginPage
+        
         return const LoginPage();
       }
     });

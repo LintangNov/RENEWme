@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:renewme/controllers/food_controller.dart';
-// 1. Pastikan Anda mengimpor file controller yang benar
 import 'package:renewme/controllers/search_page_controller.dart'; 
 import 'package:renewme/models/food.dart';
 
@@ -11,7 +10,7 @@ class SearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 2. Inisialisasi SearchPageController Anda dengan benar
+    
     final SearchPageController searchController = Get.put(SearchPageController());
     final FoodController foodController = Get.find<FoodController>();
 
@@ -21,7 +20,6 @@ class SearchPage extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // 3. Kirim controller yang benar ke helper method
           _buildSearchBar(searchController),
 
           _buildFilterButtons(foodController),
@@ -30,7 +28,7 @@ class SearchPage extends StatelessWidget {
 
           Expanded(
             child: Obx(() {
-              // 4. Gunakan variabel controller yang benar di semua logika
+
               if (searchController.textController.text.isEmpty) {
                 return _buildSearchHistory(searchController);
               }
@@ -51,7 +49,6 @@ class SearchPage extends StatelessWidget {
     );
   }
 
-  // 5. Perbaiki tipe parameter di semua helper method
   Widget _buildSearchBar(SearchPageController controller) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -74,6 +71,8 @@ class SearchPage extends StatelessWidget {
   }
   
   Widget _buildFilterButtons(FoodController controller) {
+    final SearchPageController searchController = Get.put(SearchPageController());
+    
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Row(
@@ -82,19 +81,19 @@ class SearchPage extends StatelessWidget {
           FilterChip(
             label: const Text('Terdekat'),
             onSelected: (selected) {
-              if (selected) controller.sortFoodsByDistance();
+              if (selected) searchController.sortResultsByDistance();
             },
           ),
           FilterChip(
             label: const Text('Termurah'),
             onSelected: (selected) {
-              if (selected) controller.sortFoodsByPrice(ascending: true);
+              if (selected) searchController.sortResultsByPrice(ascending: true);
             },
           ),
           FilterChip(
             label: const Text('Termahal'),
             onSelected: (selected) {
-              if (selected) controller.sortFoodsByPrice(ascending: false);
+              if (selected) searchController.sortResultsByPrice(ascending: false);
             },
           ),
         ],

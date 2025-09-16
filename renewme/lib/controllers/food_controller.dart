@@ -106,67 +106,6 @@ class FoodController extends GetxController {
   }
 }
 
-  void sortFoodsByPrice({bool ascending = true}) {
-    foodList.sort((a, b) {
-      if (ascending) {
-        return a.priceInRupiah.compareTo(b.priceInRupiah); 
-      } else {
-        return b.priceInRupiah.compareTo(a.priceInRupiah); 
-      }
-    });
-  }
-
-  Future<void> sortFoodsByDistance() async {
- 
-    if (_userController.userPosition.value == null) {
-   
-      await _userController.updateUserLocation();
-      
-      if (_userController.userPosition.value == null) {
-        Get.snackbar('Lokasi Dibutuhkan', 'Izin lokasi diperlukan untuk fitur ini.');
-        return;
-      }
-    }
-
-    try {
-      isLoading.value = true;
-
-      final Position userPosition = _userController.userPosition.value!;
-
-      
-      final List<FoodWithDistance> foodsWithDistances = foodList.map((food) {
-        final double distance = Geolocator.distanceBetween(
-          userPosition.latitude,
-          userPosition.longitude,
-          food.location.latitude,
-          food.location.longitude,
-        );
-        return FoodWithDistance(food: food, distanceInMeters: distance);
-      }).toList();
-
-      foodsWithDistances.sort((a, b) {
-        final distanceComparison =
-            a.distanceInMeters.compareTo(b.distanceInMeters);
-        if (distanceComparison != 0) {
-          return distanceComparison;
-        } else {
-          return a.food.priceInRupiah.compareTo(b.food.priceInRupiah);
-        }
-      });
-
-      final List<Food> sortedFoods =
-          foodsWithDistances.map((item) => item.food).toList();
-      foodList.assignAll(sortedFoods);
-
-    } catch (e) {
-      errorMessage.value = 'Terjadi kesalahan saat mengurutkan data.';
-      Get.snackbar('Error', errorMessage.value);
-      print('Error sorting by distance: $e');
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
   String getFoodDistanceString(Food food) {
     
     if (_userController.userPosition.value != null) {
