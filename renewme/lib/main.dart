@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:renewme/controllers/food_controller.dart';
 import 'package:renewme/repositories/food_repository.dart';
 import 'package:renewme/services/location_services.dart';
+import 'package:renewme/view/chekout_page/resto_page.dart';
 import 'firebase_options.dart';
 import 'package:get/get.dart';
 import 'package:renewme/services/auth_services.dart';
@@ -51,7 +52,7 @@ class MainApp extends StatelessWidget {
           secondary: Color(0xFFE5F0EA),
         ),
       ),
-      home: const AuthWrapper(),
+      home: const RestoPage(),
     );
   }
 }
