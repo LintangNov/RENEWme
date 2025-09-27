@@ -52,7 +52,7 @@ class MainApp extends StatelessWidget {
           secondary: Color(0xFFE5F0EA),
         ),
       ),
-      home: const RestoPage(),
+      home: const AuthWrapper(),
     );
   }
 }

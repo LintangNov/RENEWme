@@ -42,51 +42,74 @@ class _RestoPageState extends State<RestoPage> {
     super.dispose();
   }
 
+  // Method untuk menghitung total item yang dipilih
+  int get totalItems {
+    return _itemCounters.values.fold(0, (sum, count) => sum + count);
+  }
+
+  // Method untuk menghitung total harga
+  double get totalPrice {
+    double total = 0;
+    _itemCounters.forEach((foodId, count) {
+      if (count > 0) {
+        final food = foodController.foodList.firstWhere((f) => f.id == foodId);
+        total += food.priceInRupiah * count;
+      }
+    });
+    return total;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              _buildSliverAppBar(),
-              _buildRestoInfoCard(),
-              _buildMenuListTitle(),
-              Obx(() {
-                if (foodController.isLoading.value) {
-                  return const SliverToBoxAdapter(
-                    child: Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(40.0),
-                        child: CircularProgressIndicator(),
+      body: SafeArea(
+        top: false,
+        bottom: true,
+        child: Stack(
+          children: [
+            CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                _buildSliverAppBar(),
+                _buildRestoInfoCard(),
+                _buildMenuListTitle(),
+                Obx(() {
+                  if (foodController.isLoading.value) {
+                    return const SliverToBoxAdapter(
+                      child: Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(40.0),
+                          child: CircularProgressIndicator(),
+                        ),
                       ),
-                    ),
-                  );
-                }
+                    );
+                  }
 
-                if (foodController.foodList.isEmpty) {
-                  return const SliverToBoxAdapter(
-                    child: Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(40.0),
-                        child: Text('Belum ada makanan yang tersedia.'),
+                  if (foodController.foodList.isEmpty) {
+                    return const SliverToBoxAdapter(
+                      child: Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(40.0),
+                          child: Text('Belum ada makanan yang tersedia.'),
+                        ),
                       ),
-                    ),
-                  );
-                }
+                    );
+                  }
 
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    final food = foodController.foodList[index];
-                    return _buildMenuList(foodData: food);
-                  }, childCount: foodController.foodList.length),
-                );
-              }),
-              const SliverToBoxAdapter(child: SizedBox(height: 120)),
-            ],
-          ),
-        ],
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final food = foodController.foodList[index];
+                      return _buildMenuList(foodData: food);
+                    }, childCount: foodController.foodList.length),
+                  );
+                }),
+                const SliverToBoxAdapter(child: SizedBox(height: 120)),
+              ],
+            ),
+            // Checkout button yang muncul ketika ada item yang dipilih
+            if (totalItems > 0) _buildFloatingCheckoutButton(),
+          ],
+        ),
       ),
     );
   }
@@ -97,23 +120,34 @@ class _RestoPageState extends State<RestoPage> {
       pinned: true,
       backgroundColor: _isAppBarSolid ? Colors.white : Colors.transparent,
       elevation: _isAppBarSolid ? 2.0 : 0.0,
+      leading: IconButton(
+        onPressed: () {
+          Get.back(); // Karena Anda pakai GetX
+          // atau Navigator.pop(context); jika tidak pakai GetX
+        },
+        icon: Icon(
+          Icons.arrow_back_ios_new_rounded,
+          color: _isAppBarSolid ? Colors.black87 : Colors.white,
+        ),
+      ),
       iconTheme: IconThemeData(
         color: _isAppBarSolid ? Colors.black87 : Colors.white,
       ),
+
       actions: [
         IconButton(
+          onPressed: () {},
           icon: Icon(
             Icons.favorite_border,
             color: _isAppBarSolid ? Colors.black87 : Colors.white,
           ),
-          onPressed: () {},
         ),
         IconButton(
+          onPressed: () {},
           icon: Icon(
             Icons.share,
             color: _isAppBarSolid ? Colors.black87 : Colors.white,
           ),
-          onPressed: () {},
         ),
       ],
       flexibleSpace: FlexibleSpaceBar(
@@ -207,7 +241,7 @@ class _RestoPageState extends State<RestoPage> {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-        child: Text(
+        child: const Text(
           'Menu Kami',
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
         ),
@@ -239,7 +273,7 @@ class _RestoPageState extends State<RestoPage> {
                         (context, child, progress) =>
                             progress == null
                                 ? child
-                                : SizedBox(
+                                : const SizedBox(
                                   height: 120,
                                   width: 120,
                                   child: Center(
@@ -265,7 +299,7 @@ class _RestoPageState extends State<RestoPage> {
                         children: [
                           Text(
                             foodData.name,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -273,21 +307,27 @@ class _RestoPageState extends State<RestoPage> {
                           const SizedBox(height: 4),
                           Text(
                             foodData.description,
-                            style: TextStyle(color: Colors.grey, fontSize: 14),
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 14,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Sisa ${foodData.quantity}',
-                            style: TextStyle(color: Colors.grey, fontSize: 14),
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 14,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            '\$${foodData.priceInRupiah}',
-                            style: TextStyle(
+                            'Rp ${foodData.priceInRupiah}',
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.green,
@@ -304,6 +344,7 @@ class _RestoPageState extends State<RestoPage> {
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               if (counter > 0) ...[
                                 IconButton(
@@ -314,18 +355,27 @@ class _RestoPageState extends State<RestoPage> {
                                   ),
                                   onPressed: () {
                                     setState(() {
-                                      _itemCounters[foodData.id] = counter - 1;
+                                      if (_itemCounters[foodData.id]! > 1) {
+                                        _itemCounters[foodData.id] =
+                                            counter - 1;
+                                      } else {
+                                        _itemCounters.remove(foodData.id);
+                                      }
                                     });
                                   },
                                 ),
-                                Text(
-                                  '$counter',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                  ),
+                                  child: Text(
+                                    '$counter',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                                _buildCheckOutButton(foodData: foodData),
                               ],
                               IconButton(
                                 icon: const Icon(
@@ -334,9 +384,21 @@ class _RestoPageState extends State<RestoPage> {
                                   size: 18,
                                 ),
                                 onPressed: () {
-                                  setState(() {
-                                    _itemCounters[foodData.id] = counter + 1;
-                                  });
+                                  if (counter < foodData.quantity) {
+                                    setState(() {
+                                      _itemCounters[foodData.id] = counter + 1;
+                                    });
+                                  } else {
+                                    // Tampilkan pesan jika stok habis
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Stok makanan tidak mencukupi!',
+                                        ),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
                                 },
                               ),
                             ],
@@ -354,39 +416,67 @@ class _RestoPageState extends State<RestoPage> {
     );
   }
 
-  Widget _buildCheckOutButton({required Food foodData}) {
-    return Align(
-      alignment: Alignment.bottomCenter,
+  Widget _buildFloatingCheckoutButton() {
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 0,
       child: Container(
-        width: double.infinity,
         padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black38,
-              blurRadius: 10,
-              spreadRadius: 5,
+              color: Colors.black12,
+              blurRadius: 8,
+              spreadRadius: 2,
+              offset: Offset(0, -8),
             ),
           ],
         ),
-        child: ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF53B675),
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              children: [
+                Text(
+                  '$totalItems item${totalItems > 1 ? 's' : ''}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                Text('Rp ${totalPrice.toInt()}'),
+              ],
             ),
-          ),
-          child: Text(
-            'Tambahkan ke Keranjang - Rp${foodData.priceInRupiah}',
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+            ElevatedButton(
+              onPressed: () {
+                // Handle checkout action
+                print('Checkout with total: Rp ${totalPrice.toInt()}');
+                print('Total items: $totalItems');
+                // - Rp ${totalPrice.toInt()}
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF53B675),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 10,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+              child: Text(
+                'Pesan Sekarang',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
