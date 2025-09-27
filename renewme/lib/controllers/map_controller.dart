@@ -6,16 +6,19 @@ import 'package:latlong2/latlong.dart';
 import 'package:renewme/controllers/food_controller.dart';
 import 'package:renewme/controllers/user_controller.dart';
 import 'package:renewme/models/food.dart';
+import 'package:renewme/services/location_services.dart';
 
 class MapController extends GetxController {
   // Mengambil dependency dari controller lain yang sudah ada.
   final FoodController _foodController = Get.find<FoodController>();
   final UserController _userController = Get.find<UserController>();
+  final LocationService _LocationService = Get.find<LocationService>();
 
   // Variabel reaktif untuk state peta.
   final RxList<Marker> markers = <Marker>[].obs;
   final Rx<LatLng> initialCenter = const LatLng(-6.2088, 106.8456).obs; // Default: Jakarta
   final RxBool isLoading = true.obs;
+  final RxList<LatLng> routePoints = <LatLng>[].obs;
 
   @override
   void onInit() {
@@ -82,6 +85,28 @@ class MapController extends GetxController {
       margin: const EdgeInsets.all(10),
       borderRadius: 10,
     );
+  }
+
+  Future<void> fetchRouteToFood(Food food) async {
+    if (_userController.userPosition.value == null) {
+      Get.snackbar('Error', 'Lokasi Anda tidak ditemukan untuk membuat rute.');
+      return;
+    }
+
+    isLoading.value = true;
+    routePoints.clear();
+    
+    final userPos = _userController.userPosition.value!;
+    final start = LatLng(userPos.latitude, userPos.longitude);
+    final end = LatLng(food.location.latitude, food.location.longitude);
+
+    final points = await _LocationService.getRoute(start, end);
+    if (points != null) {
+      routePoints.assignAll(points);
+    } else {
+      Get.snackbar('Error', 'Gagal mendapatkan data rute.');
+    }
+    isLoading.value = false;
   }
 }
 

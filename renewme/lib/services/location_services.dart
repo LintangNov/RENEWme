@@ -2,18 +2,18 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
-
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:latlong2/latlong.dart';
 
 class LocationService {
-  /// Mendapatkan lokasi pengguna saat ini dengan alur baru.
+  /// Mendapatkan lokasi pengguna saat ini 
   Future<Position> getCurrentLocation() async {
     bool serviceEnabled;
     LocationPermission permission;
 
-    // 1. Cek apakah layanan lokasi (GPS) di perangkat aktif.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // JIKA GPS TIDAK AKTIF: Tampilkan dialog untuk meminta pengguna mengaktifkannya.
       await Get.defaultDialog(
         title: "GPS Tidak Aktif",
         middleText: "Aplikasi ini membutuhkan GPS untuk menemukan lokasi. Mohon aktifkan GPS.",
@@ -25,18 +25,14 @@ class LocationService {
           Get.back(); // Tutup dialog
         },
       );
-      // Kembalikan error karena proses tidak bisa dilanjutkan saat ini.
       return Future.error('Layanan lokasi tidak aktif.');
     }
 
-    // 2. Cek status izin yang sudah diberikan.
     permission = await Geolocator.checkPermission();
 
-    // 3. Jika izin ditolak (denied), minta izin secara eksplisit.
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       
-      // JIKA IZIN DITOLAK LAGI: Tampilkan snackbar lalu keluar dari aplikasi.
       if (permission == LocationPermission.denied) {
         Get.snackbar(
           'Izin Ditolak',
@@ -45,14 +41,13 @@ class LocationService {
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
-        // Tunggu 3 detik agar snackbar terlihat, lalu tutup aplikasi.
+
         await Future.delayed(const Duration(seconds: 3));
         SystemNavigator.pop(); // Keluar dari aplikasi.
         return Future.error('Izin lokasi ditolak oleh pengguna.');
       }
     }
 
-    // 4. Jika izin ditolak permanen, beri tahu pengguna dan keluar.
     if (permission == LocationPermission.deniedForever) {
       Get.snackbar(
         'Izin Ditolak Permanen',
@@ -67,9 +62,32 @@ class LocationService {
       return Future.error('Izin lokasi ditolak permanen.');
     }
 
-    // 5. Jika semua izin beres, dapatkan posisi pengguna.
     return await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
     );
+  }
+
+  Future<List<LatLng>?> getRoute(LatLng start, LatLng end) async {
+    // URL OSRM public API
+    var url = Uri.parse(
+        'http://router.project-osrm.org/route/v1/driving/${start.longitude},${start.latitude};${end.longitude},${end.latitude}?overview=full&geometries=geojson');
+    
+    try {
+      var response = await http.get(url);
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+      
+        var routeCoordinates = data['routes'][0]['geometry']['coordinates'];
+        
+        List<LatLng> routePoints = [];
+        for (var coordinate in routeCoordinates) {
+          routePoints.add(LatLng(coordinate[1], coordinate[0]));
+        }
+        return routePoints;
+      }
+    } catch (e) {
+      print("Error getting route: $e");
+    }
+    return null;
   }
 }
