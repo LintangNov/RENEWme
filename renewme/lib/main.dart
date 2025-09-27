@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:renewme/controllers/cart_controller.dart';
 import 'package:renewme/controllers/food_controller.dart';
 import 'package:renewme/repositories/food_repository.dart';
 import 'package:renewme/services/location_services.dart';
@@ -23,6 +24,7 @@ Future<void> initDependencies() async {
 
   Get.put(UserController());
   Get.lazyPut(() => FoodController());
+  Get.put(CartController());
 }
 
 void main() async {
@@ -52,7 +54,7 @@ class MainApp extends StatelessWidget {
           secondary: Color(0xFFE5F0EA),
         ),
       ),
-      home: const RestoPage(),
+      home: const AuthWrapper(),
     );
   }
 }

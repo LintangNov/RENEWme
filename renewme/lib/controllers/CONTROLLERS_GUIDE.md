@@ -1,3 +1,10 @@
+File ini mencakup panduan penggunaan dari:
+- UserController
+- FoodController
+- SearchController
+- MapController
+- CartController
+
 # USER CONTROLLER GUIDE
 
 ### 1. instalasi
@@ -209,3 +216,119 @@ Sebagian besar logika di controller ini berjalan otomatis saat diinisialisasi (`
     * **Fungsi**: Method yang dipanggil saat sebuah marker di peta ditekan.
     * **Aksi**: Akan menampilkan `Snackbar` di bagian bawah layar yang berisi nama dan harga makanan.
     * **Cara Pakai**: Method ini sudah terhubung secara otomatis ke properti `onPressed` dari setiap `IconButton` di dalam marker yang dibuat oleh controller.
+
+# CART CONTROLLER GUIDE 
+Controller ini mengelola semua data dan logika yang berhubungan dengan keranjang belanja pengguna, seperti daftar item, total harga, dan jumlah item.
+
+### 1. Instalasi
+Controller ini bersifat global dan harus tersedia di seluruh aplikasi.
+
+a. Dependensi: Pastikan Anda sudah membuat model CartItem di lib/models/cart_item.dart.
+
+b. Inisialisasi di main.dart: CartController harus diinisialisasi sebagai singleton menggunakan Get.put() di dalam fungsi initDependencies() agar datanya tidak hilang saat berpindah halaman. (Lihat bagian "Langkah Awal" di atas).
+
+c. Akses di View: Untuk menggunakan controller di halaman mana pun, panggil Get.find():
+
+  ```dart
+  final CartController cartController = Get.find<CartController>();
+  ```
+
+### 2. Variabel & Properti Penting
+Akses variabel ini dari View melalui instance controller yang sudah Anda dapatkan.
+
+* RxList<CartItem> cartItems: (Observable) Ini adalah daftar inti yang menyimpan semua item makanan yang ada di keranjang beserta       jumlahnya.
+
+* double get totalPrice: (Properti Reaktif) Secara otomatis menghitung total harga dari semua item di keranjang. Nilainya akan selalu ter-update setiap kali cartItems berubah.
+
+* int get totalItems: (Properti Reaktif) Secara otomatis menghitung jumlah total dari semua item di keranjang (misalnya, 2 porsi Nasi Goreng + 1 porsi Sate = 3 item).
+
+### 3. Daftar Method Siap Pakai
+
+* addItem(Food food)
+**Fungsi**: Menambahkan satu porsi makanan ke keranjang. Jika makanan tersebut sudah ada, maka hanya jumlahnya (quantity) yang akan ditambah satu.
+**Cara Pakai**: Panggil dari tombol "Tambah" atau "+" pada setiap item makanan.
+
+* removeItem(Food food)
+**Fungsi**: Mengurangi satu porsi makanan dari keranjang. Jika jumlahnya lebih dari satu, maka hanya quantity-nya yang dikurangi. Jika jumlahnya sisa satu, maka item tersebut akan dihapus sepenuhnya dari keranjang.
+**Cara Pakai**: Panggil dari tombol "Kurang" atau "-" di halaman keranjang.
+
+* clearCart()
+**Fungsi**: Menghapus semua item dari keranjang.
+**Cara Pakai**: Panggil dari tombol "Kosongkan Keranjang".
+
+### 4. Contoh Penggunaan di View
+
+// Contoh widget untuk ikon keranjang di AppBar
+
+class CartIconBadge extends StatelessWidget {
+  const CartIconBadge({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // 1. Ambil instance CartController
+    final CartController cartController = Get.find<CartController>();
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 16.0),
+      // 2. Bungkus dengan Obx agar UI otomatis update
+      child: Obx(() {
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            // Ikon keranjang
+            IconButton(
+              icon: const Icon(Icons.shopping_cart_outlined),
+              onPressed: () {
+                // Aksi saat ditekan, misal navigasi ke halaman keranjang
+                // atau menampilkan total harga
+                Get.snackbar(
+                  'Total Belanja',
+                  'Rp${cartController.totalPrice.toStringAsFixed(0)}',
+                  snackPosition: SnackPosition.TOP,
+                );
+              },
+            ),
+            // Badge (lingkaran merah) yang menampilkan jumlah item
+            if (cartController.totalItems > 0)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  constraints: const BoxConstraints(
+                    minWidth: 16,
+                    minHeight: 16,
+                  ),
+                  child: Text(
+                    // 3. Gunakan properti reaktif totalItems
+                    cartController.totalItems.toString(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+          ],
+        );
+      }),
+    );
+  }
+}
+
+// Cara pakainya di dalam Scaffold:
+//
+// Scaffold(
+//   appBar: AppBar(
+//     title: Text("Menu"),
+//     actions: [
+//       CartIconBadge(),
+//     ],
+//   ),
+//   // ...
+// );
