@@ -147,7 +147,10 @@ class _RestoPageState extends State<RestoPage> {
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.green.shade50,
                     borderRadius: BorderRadius.circular(20),
@@ -232,21 +235,24 @@ class _RestoPageState extends State<RestoPage> {
                     height: 120,
                     width: 120,
                     fit: BoxFit.cover,
-                    loadingBuilder: (context, child, progress) => progress == null
-                        ? child
-                        : SizedBox(
-                            height: 120,
-                            width: 120,
-                            child: Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          ),
-                    errorBuilder: (context, error, stack) => Image.asset(
-                      'assets/images/food_loading_image.png',
-                      height: 120,
-                      width: 120,
-                      fit: BoxFit.cover,
-                    ),
+                    loadingBuilder:
+                        (context, child, progress) =>
+                            progress == null
+                                ? child
+                                : SizedBox(
+                                  height: 120,
+                                  width: 120,
+                                  child: Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                ),
+                    errorBuilder:
+                        (context, error, stack) => Image.asset(
+                          'assets/images/food_loading_image.png',
+                          height: 120,
+                          width: 120,
+                          fit: BoxFit.cover,
+                        ),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -319,6 +325,7 @@ class _RestoPageState extends State<RestoPage> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
+                                _buildCheckOutButton(foodData: foodData),
                               ],
                               IconButton(
                                 icon: const Icon(
@@ -340,6 +347,44 @@ class _RestoPageState extends State<RestoPage> {
                   ),
                 ),
               ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCheckOutButton({required Food foodData}) {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black38,
+              blurRadius: 10,
+              spreadRadius: 5,
+            ),
+          ],
+        ),
+        child: ElevatedButton(
+          onPressed: () {},
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF53B675),
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+          ),
+          child: Text(
+            'Tambahkan ke Keranjang - Rp${foodData.priceInRupiah}',
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
           ),
         ),
