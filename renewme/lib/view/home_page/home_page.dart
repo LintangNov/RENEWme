@@ -8,6 +8,7 @@ import 'package:renewme/models/food.dart';
 import 'package:renewme/models/user.dart';
 import 'package:renewme/utils/date_helper.dart';
 import 'package:renewme/utils/location_helper.dart';
+import 'package:renewme/view/chekout_page/resto_page.dart';
 import 'package:renewme/view/search_page/search_page.dart';
 
 // 1. Diubah menjadi StatelessWidget untuk efisiensi dan best practice.
@@ -569,25 +570,28 @@ void _showFoodDetailSheet(Food foodData, FoodController foodController) {
                           }
                           if (snapshot.hasData && snapshot.data != null) {
                             final User vendor = snapshot.data!;
-                            return Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 15,
-                                  backgroundImage: NetworkImage(
-                                    vendor.profilePictURL,
+                            return InkWell(
+                              onTap: () => Get.to(() => RestoPage()),
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 15,
+                                    backgroundImage: NetworkImage(
+                                      vendor.profilePictURL,
+                                    ),
+                                    onBackgroundImageError:
+                                        (e, s) => const Icon(Icons.person),
                                   ),
-                                  onBackgroundImageError:
-                                      (e, s) => const Icon(Icons.person),
-                                ),
-                                const SizedBox(width: 12),
-                                Text(
-                                  vendor.username,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    vendor.username,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             );
                           }
                           return const Row(
